@@ -84,3 +84,15 @@ Lancer tous les tests
 Dans backend/ (venv actif) :
 
 python3 -m pytest -q
+
+Lancement prod : 
+cd backend
+source .venv/bin/activate
+
+python3 -m sanic app:create_app --factory --reload --host=0.0.0.0 --port=8000
+
+Lancement rabbitmq : docker compose up -d rabbitmq
+
+Lancer le consumer : python3 consume_hello.py
+
+
