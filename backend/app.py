@@ -9,11 +9,12 @@ from sanic import Sanic
 from sanic.response import json
 from sanic.exceptions import InvalidUsage
 from sanic.log import logger
+
+from sqlalchemy import insert, select
+
 from routes.users_controller import bp_users
 from routes.spots_controller import bp_spots
 from routes.parking_controller import bp_parking
-
-from sqlalchemy import insert, select
 
 from db import make_engine, make_session_factory, init_db, hello_table
 
@@ -26,6 +27,11 @@ def create_app() -> Sanic:
 
     app = Sanic("parking-reservation-api")
 
+    # ✅ REGISTER ROUTES / BLUEPRINTS HERE
+    app.blueprint(bp_users)
+    app.blueprint(bp_spots)
+    app.blueprint(bp_parking)
+
     # --- DB ---
     engine = make_engine()
     Session = make_session_factory(engine)
@@ -35,8 +41,6 @@ def create_app() -> Sanic:
     queue_name = os.getenv("HELLO_QUEUE", "hello.queue")
 
     # Toggle MQ :
-    # - en prod: activé
-    # - en test: activé seulement si AMQP_URL est défini explicitement
     mq_disabled = os.getenv("DISABLE_MQ", "0") == "1"
     mq_enabled = (not mq_disabled) and (not test_mode or "AMQP_URL" in os.environ)
 
@@ -141,10 +145,6 @@ def create_app() -> Sanic:
 
         # 3) Réponse HTTP
         return json({"id": row["id"], "message": row["message"]})
-
-        app.blueprint(bp_users)
-        app.blueprint(bp_spots)
-        app.blueprint(bp_parking)
 
     return app
 
