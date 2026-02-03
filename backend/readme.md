@@ -97,3 +97,13 @@ Lancer le consumer : python3 consume_hello.py
 
 
 Lancement app avec docker : docker compose up --build
+
+
+User : email, nom, prenom, roles, spotassocie?: 
+Roles : Manager, secretaire, employee
+Parking : Slots, SlotsMax, OccupationRate.
+spot: Free, electrical, from, to.
+
+Log : Spot from to : User : SpotAssocié.
+
+Services : email service.
