@@ -12,6 +12,7 @@ from sanic.log import logger
 
 from sqlalchemy import insert, select
 
+from routes.auth_controller import bp_auth   # ✅ AJOUT
 from routes.users_controller import bp_users
 from routes.spots_controller import bp_spots
 from routes.parking_controller import bp_parking
@@ -28,6 +29,7 @@ def create_app() -> Sanic:
     app = Sanic("parking-reservation-api")
 
     # ✅ REGISTER ROUTES / BLUEPRINTS HERE
+    app.blueprint(bp_auth)   # ✅ AJOUT
     app.blueprint(bp_users)
     app.blueprint(bp_spots)
     app.blueprint(bp_parking)
