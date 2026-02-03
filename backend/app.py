@@ -1,7 +1,9 @@
 import os
 import json as pyjson
-
+import asyncio
 import aio_pika
+from aiormq.exceptions import AMQPConnectionError  # pour attraper l'erreur RabbitMQ
+
 from sanic import Sanic
 from sanic.response import json
 from sanic.exceptions import InvalidUsage
@@ -32,10 +34,31 @@ def create_app() -> Sanic:
         app.ctx.engine = engine
         app.ctx.Session = Session
 
-        # MQ init
-        connection = await aio_pika.connect_robust(amqp_url)
-        channel = await connection.channel()
-        await channel.declare_queue(queue_name, durable=True)
+        # --- MQ init (AVEC RETRY LOGIC) ---
+        connection = None
+        channel = None
+
+        retries = 10  # On tente pendant ~50 secondes (10 * 5s)
+        while retries > 0:
+            try:
+                print(f"Tentative de connexion à RabbitMQ ({amqp_url})...")
+                connection = await aio_pika.connect_robust(amqp_url)
+
+                # Si on arrive ici, c'est connecté
+                channel = await connection.channel()
+                await channel.declare_queue(queue_name, durable=True)
+                print("✅ Connecté à RabbitMQ avec succès !")
+                break
+
+            except (AMQPConnectionError, OSError) as e:
+                # Si RabbitMQ n'est pas encore prêt (Connection Refused)
+                retries -= 1
+                if retries == 0:
+                    print("❌ Échec critique : Impossible de se connecter à RabbitMQ après plusieurs essais.")
+                    raise e  # On fait planter l'app pour que Docker la redémarre
+
+                print(f"⚠️ RabbitMQ indisponible. Nouvelle tentative dans 5s... ({retries} essais restants)")
+                await asyncio.sleep(5)
 
         app.ctx.amqp_connection = connection
         app.ctx.amqp_channel = channel
@@ -44,7 +67,7 @@ def create_app() -> Sanic:
     @app.after_server_stop
     async def teardown(app):
         # MQ close
-        if hasattr(app.ctx, "amqp_connection"):
+        if hasattr(app.ctx, "amqp_connection") and app.ctx.amqp_connection:
             await app.ctx.amqp_connection.close()
 
         # DB close
