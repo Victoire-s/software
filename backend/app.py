@@ -1,4 +1,5 @@
 import os
+import asyncio
 import json as pyjson
 
 import aio_pika
@@ -33,7 +34,16 @@ def create_app() -> Sanic:
         app.ctx.Session = Session
 
         # MQ init
-        connection = await aio_pika.connect_robust(amqp_url)
+        last_error = None
+        for _ in range(10):
+            try:
+                connection = await aio_pika.connect_robust(amqp_url)
+                break
+            except Exception as exc:  # pragma: no cover - startup retry
+                last_error = exc
+                await asyncio.sleep(2)
+        else:
+            raise last_error
         channel = await connection.channel()
         await channel.declare_queue(queue_name, durable=True)
 
@@ -49,6 +59,14 @@ def create_app() -> Sanic:
 
         # DB close
         await app.ctx.engine.dispose()
+
+    @app.get("/")
+    async def root(request):
+        return json({"status": "ok", "service": "parking-reservation-api"})
+
+    @app.get("/health")
+    async def health(request):
+        return json({"status": "ok"})
 
     @app.post("/hello")
     async def post_hello(request):
