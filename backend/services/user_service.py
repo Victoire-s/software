@@ -37,3 +37,6 @@ class UserService:
 
     async def remove_role(self, user_id: int, role: str):
         return await self.user_repo.remove_role(user_id, role)
+        
+    async def get_user_by_email(self, email: str):
+        return await self.user_repo.get_by_email(email)
