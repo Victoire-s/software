@@ -7,6 +7,7 @@ from sanic.exceptions import InvalidUsage
 from routes.security import require_roles
 from repositories.parking_repository import ParkingRepository
 from services.parking_service import ParkingService
+from utils.jsonable import to_jsonable  # ✅
 
 
 bp_parking = Blueprint("parking", url_prefix="/parking")
@@ -22,7 +23,8 @@ async def view(request):
     async with request.app.ctx.Session() as session:
         repo = ParkingRepository(session)
         service = ParkingService(repo)
-        return json(await service.get_parking_view())
+        data = await service.get_parking_view()
+        return json(to_jsonable(data))  # ✅
 
 
 @bp_parking.get("/config")
@@ -31,7 +33,8 @@ async def get_config(request):
     async with request.app.ctx.Session() as session:
         repo = ParkingRepository(session)
         service = ParkingService(repo)
-        return json(await service.get_config())
+        data = await service.get_config()
+        return json(to_jsonable(data))  # ✅
 
 
 @bp_parking.put("/config")
@@ -45,7 +48,8 @@ async def update_config(request):
     async with request.app.ctx.Session() as session:
         repo = ParkingRepository(session)
         service = ParkingService(repo)
-        return json(await service.update_config(slots_max=slots_max))
+        data = await service.update_config(slots_max=slots_max)
+        return json(to_jsonable(data))  # ✅
 
 
 @bp_parking.post("/config/reset")
@@ -59,4 +63,5 @@ async def reset_config(request):
     async with request.app.ctx.Session() as session:
         repo = ParkingRepository(session)
         service = ParkingService(repo)
-        return json(await service.reset_config(slots_max=slots_max))
+        data = await service.reset_config(slots_max=slots_max)
+        return json(to_jsonable(data))  # ✅
