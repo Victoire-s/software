@@ -9,6 +9,9 @@ from sanic import Sanic
 from sanic.response import json
 from sanic.exceptions import InvalidUsage
 from sanic.log import logger
+from routes.users_controller import bp_users
+from routes.spots_controller import bp_spots
+from routes.parking_controller import bp_parking
 
 from sqlalchemy import insert, select
 
@@ -138,6 +141,10 @@ def create_app() -> Sanic:
 
         # 3) Réponse HTTP
         return json({"id": row["id"], "message": row["message"]})
+
+        app.blueprint(bp_users)
+        app.blueprint(bp_spots)
+        app.blueprint(bp_parking)
 
     return app
 
