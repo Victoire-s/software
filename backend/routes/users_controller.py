@@ -9,7 +9,6 @@ from repositories.user_repository import UserRepository
 from services.user_service import UserService
 from utils.jsonable import to_jsonable
 
-
 bp_users = Blueprint("users", url_prefix="/users")
 
 
@@ -157,7 +156,7 @@ async def get_roles(request, user_id: int):
         roles = await repo.get_roles(user_id)
         if roles is None:
             raise NotFound("User not found")
-        return json({"user_id": user_id, "roles": to_jsonable(roles)})
+        return json({"user_id": user_id, "roles": roles})
 
 
 @bp_users.put("/<user_id:int>/roles")
@@ -172,7 +171,9 @@ async def set_roles(request, user_id: int):
         repo = UserRepository(session)
         service = UserService(repo)
         new_roles = await service.set_roles(user_id, [r.strip().upper() for r in roles])
-        return json({"user_id": user_id, "roles": to_jsonable(new_roles)})
+        if new_roles is None:
+            raise NotFound("User not found")
+        return json({"user_id": user_id, "roles": new_roles})
 
 
 @bp_users.post("/<user_id:int>/roles")
@@ -187,7 +188,9 @@ async def add_role(request, user_id: int):
         repo = UserRepository(session)
         service = UserService(repo)
         roles = await service.add_role(user_id, role.strip().upper())
-        return json({"user_id": user_id, "roles": to_jsonable(roles)})
+        if roles is None:
+            raise NotFound("User not found")
+        return json({"user_id": user_id, "roles": roles})
 
 
 @bp_users.delete("/<user_id:int>/roles/<role:str>")
@@ -197,4 +200,6 @@ async def remove_role(request, user_id: int, role: str):
         repo = UserRepository(session)
         service = UserService(repo)
         roles = await service.remove_role(user_id, role.strip().upper())
-        return json({"user_id": user_id, "roles": to_jsonable(roles)})
+        if roles is None:
+            raise NotFound("User not found")
+        return json({"user_id": user_id, "roles": roles})
