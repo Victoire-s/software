@@ -96,3 +96,4 @@ Lancement rabbitmq : docker compose up -d rabbitmq
 Lancer le consumer : python3 consume_hello.py
 
 
+Lancement app avec docker : docker compose up --build
