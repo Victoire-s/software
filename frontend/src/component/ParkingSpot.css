@@ -1,0 +1,159 @@
+.parking-spot {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  position: relative;
+  min-height: 60px;
+}
+
+.spot-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 100%;
+  height: 100%;
+}
+
+.spot-id {
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+}
+
+.electric-icon {
+  font-size: 0.875rem;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--electric-color);
+  color: white;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.625rem;
+}
+
+/* Available spot */
+.parking-spot.available {
+  background: white;
+  border-color: var(--primary-light);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+}
+
+.parking-spot.available:hover {
+  background: #eff6ff;
+  border-color: var(--primary-color);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+  z-index: 10;
+}
+
+/* Reserved spot */
+.parking-spot.reserved {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: var(--danger-color);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.parking-spot.reserved .spot-id {
+  color: var(--danger-color);
+}
+
+/* Selected spot */
+.parking-spot.selected {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  border-color: var(--primary-dark);
+  transform: scale(1.08);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
+  z-index: 20;
+  animation: pulse 2s infinite;
+}
+
+.parking-spot.selected .spot-id {
+  color: white;
+  font-weight: 700;
+}
+
+.parking-spot.selected .electric-icon {
+  background: white;
+  color: var(--electric-color);
+}
+
+/* Unavailable spot (filtered out by needs) */
+.parking-spot.unavailable {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.parking-spot.unavailable .spot-id {
+  color: var(--text-secondary);
+}
+
+/* Electric spots special styling */
+.parking-spot.has-electric.available {
+  background: linear-gradient(135deg, #fffbeb 0%, white 100%);
+  border-color: var(--electric-color);
+}
+
+.parking-spot.has-electric.available:hover {
+  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+}
+
+/* Pulse animation for selected spot */
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.6);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .parking-spot {
+    min-height: 50px;
+  }
+
+  .spot-id {
+    font-size: 0.7rem;
+  }
+
+  .electric-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .parking-spot {
+    min-height: 40px;
+    border-radius: 4px;
+  }
+
+  .spot-id {
+    font-size: 0.625rem;
+  }
+
+  .electric-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 0.5rem;
+    top: 1px;
+    right: 1px;
+  }
+}
