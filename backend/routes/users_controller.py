@@ -7,6 +7,7 @@ from sanic.exceptions import InvalidUsage, NotFound
 from routes.security import require_auth, require_roles
 from repositories.user_repository import UserRepository
 from services.user_service import UserService
+from utils.jsonable import to_jsonable
 
 
 bp_users = Blueprint("users", url_prefix="/users")
@@ -26,7 +27,7 @@ async def me(request):
         user = await service.get_user(request.ctx.user_id)
         if not user:
             raise NotFound("User not found")
-        return json(user)
+        return json(to_jsonable(user))
 
 
 @bp_users.patch("/me")
@@ -50,7 +51,7 @@ async def patch_me(request):
         )
         if not updated:
             raise NotFound("User not found")
-        return json(updated)
+        return json(to_jsonable(updated))
 
 
 # -------------------- ADMIN (SECRETAIRE) --------------------
@@ -61,7 +62,8 @@ async def list_users(request):
     async with request.app.ctx.Session() as session:
         repo = UserRepository(session)
         service = UserService(repo)
-        return json(await service.list_users())
+        users = await service.list_users()
+        return json(to_jsonable(users))
 
 
 @bp_users.post("/")
@@ -88,13 +90,13 @@ async def create_user(request):
         repo = UserRepository(session)
         service = UserService(repo)
         created = await service.create_user(
-            email=email.strip(),
+            email=email.strip().lower(),
             nom=nom.strip(),
             prenom=prenom.strip(),
             roles=[r.strip().upper() for r in roles],
             spot_associe=spot_associe,
         )
-        return json(created, status=201)
+        return json(to_jsonable(created), status=201)
 
 
 @bp_users.get("/<user_id:int>")
@@ -106,7 +108,7 @@ async def get_user(request, user_id: int):
         user = await service.get_user(user_id)
         if not user:
             raise NotFound("User not found")
-        return json(user)
+        return json(to_jsonable(user))
 
 
 @bp_users.patch("/<user_id:int>")
@@ -130,7 +132,7 @@ async def patch_user(request, user_id: int):
         )
         if not updated:
             raise NotFound("User not found")
-        return json(updated)
+        return json(to_jsonable(updated))
 
 
 @bp_users.delete("/<user_id:int>")
@@ -155,7 +157,7 @@ async def get_roles(request, user_id: int):
         roles = await repo.get_roles(user_id)
         if roles is None:
             raise NotFound("User not found")
-        return json({"user_id": user_id, "roles": roles})
+        return json({"user_id": user_id, "roles": to_jsonable(roles)})
 
 
 @bp_users.put("/<user_id:int>/roles")
@@ -170,7 +172,7 @@ async def set_roles(request, user_id: int):
         repo = UserRepository(session)
         service = UserService(repo)
         new_roles = await service.set_roles(user_id, [r.strip().upper() for r in roles])
-        return json({"user_id": user_id, "roles": new_roles})
+        return json({"user_id": user_id, "roles": to_jsonable(new_roles)})
 
 
 @bp_users.post("/<user_id:int>/roles")
@@ -185,7 +187,7 @@ async def add_role(request, user_id: int):
         repo = UserRepository(session)
         service = UserService(repo)
         roles = await service.add_role(user_id, role.strip().upper())
-        return json({"user_id": user_id, "roles": roles})
+        return json({"user_id": user_id, "roles": to_jsonable(roles)})
 
 
 @bp_users.delete("/<user_id:int>/roles/<role:str>")
@@ -195,4 +197,4 @@ async def remove_role(request, user_id: int, role: str):
         repo = UserRepository(session)
         service = UserService(repo)
         roles = await service.remove_role(user_id, role.strip().upper())
-        return json({"user_id": user_id, "roles": roles})
+        return json({"user_id": user_id, "roles": to_jsonable(roles)})
