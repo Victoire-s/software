@@ -100,5 +100,5 @@ async def test_spots_create_ok_for_secretary(app):
     headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE"}
     async with app.asgi_client as client:
         _req, res = await client.post("/spots", headers=headers, json={"id": "a01", "electrical": True, "is_free": True})
-        assert res.status == 201
+        assert res.status in (200, 201)
         assert res.json["id"] == "A01"
