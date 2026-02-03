@@ -10,7 +10,7 @@ Application interne pour gérer la réservation de places de parking (créneaux 
 /
   backend/      # API (Python + Sanic)
   frontend/     # Web app (React)
-  docs/         # ADR + diagrammes (C4)
+  architecture/         # ADR + diagrammes (C4)
   scripts/      # build/run/test (scripts simples)
   docker-compose.yml
 

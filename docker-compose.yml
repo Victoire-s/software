@@ -13,9 +13,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # DB (MySQL du compose)
       DATABASE_URL: "mysql+asyncmy://parking:parking@mysql:3306/parking"
-      # RabbitMQ du compose
       AMQP_URL: "amqp://guest:guest@rabbitmq:5672/"
       HELLO_QUEUE: "hello.queue"
       SANIC_TEST_MODE: "0"
@@ -55,6 +53,15 @@ services:
       interval: 5s
       timeout: 3s
       retries: 25
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
 
 volumes:
   mysql_data:
