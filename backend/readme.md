@@ -100,7 +100,7 @@ Lancement app avec docker : docker compose up --build
 
 
 User : email, nom, prenom, roles, spotassocie?: 
-Roles : Manager, secretaire, employee
+Roles : Manager, secretaire, employee ( enum )
 Parking : Slots, SlotsMax, OccupationRate.
 spot: Free, electrical, from, to.
 
