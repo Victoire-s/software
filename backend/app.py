@@ -1,13 +1,15 @@
 import os
 import asyncio
 import json as pyjson
-import asyncio
+
 import aio_pika
-from aiormq.exceptions import AMQPConnectionError  # pour attraper l'erreur RabbitMQ
+from aiormq.exceptions import AMQPConnectionError
 
 from sanic import Sanic
 from sanic.response import json
 from sanic.exceptions import InvalidUsage
+from sanic.log import logger
+
 from sqlalchemy import insert, select
 
 from db import make_engine, make_session_factory, init_db, hello_table
@@ -15,7 +17,8 @@ from db import make_engine, make_session_factory, init_db, hello_table
 
 def create_app() -> Sanic:
     # En test, ça évite l'erreur "app name already in use"
-    if os.getenv("SANIC_TEST_MODE", "0") == "1":
+    test_mode = os.getenv("SANIC_TEST_MODE", "0") == "1"
+    if test_mode:
         Sanic.test_mode = True
 
     app = Sanic("parking-reservation-api")
@@ -28,6 +31,12 @@ def create_app() -> Sanic:
     amqp_url = os.getenv("AMQP_URL", "amqp://guest:guest@localhost:5672/")
     queue_name = os.getenv("HELLO_QUEUE", "hello.queue")
 
+    # Toggle MQ :
+    # - en prod: activé
+    # - en test: activé seulement si AMQP_URL est défini explicitement
+    mq_disabled = os.getenv("DISABLE_MQ", "0") == "1"
+    mq_enabled = (not mq_disabled) and (not test_mode or "AMQP_URL" in os.environ)
+
     @app.before_server_start
     async def setup(app):
         # DB init
@@ -35,51 +44,58 @@ def create_app() -> Sanic:
         app.ctx.engine = engine
         app.ctx.Session = Session
 
-        # --- MQ init (AVEC RETRY LOGIC) ---
+        # MQ init (optionnel)
+        app.ctx.amqp_connection = None
+        app.ctx.amqp_channel = None
+        app.ctx.hello_queue = queue_name
+
+        if not mq_enabled:
+            logger.info("MQ disabled (test mode or DISABLE_MQ=1)")
+            return
+
+        retries = int(os.getenv("AMQP_RETRIES", "10"))
+        delay_s = int(os.getenv("AMQP_RETRY_DELAY_S", "5"))
+
         connection = None
         channel = None
 
-        retries = 10  # On tente pendant ~50 secondes (10 * 5s)
         while retries > 0:
             try:
-                print(f"Tentative de connexion à RabbitMQ ({amqp_url})...")
+                logger.info(f"Tentative de connexion à RabbitMQ ({amqp_url})...")
                 connection = await aio_pika.connect_robust(amqp_url)
 
-                # Si on arrive ici, c'est connecté
                 channel = await connection.channel()
                 await channel.declare_queue(queue_name, durable=True)
-                print("✅ Connecté à RabbitMQ avec succès !")
+
+                logger.info("✅ Connecté à RabbitMQ avec succès !")
                 break
 
             except (AMQPConnectionError, OSError) as e:
-                # Si RabbitMQ n'est pas encore prêt (Connection Refused)
                 retries -= 1
                 if retries == 0:
-                    print("❌ Échec critique : Impossible de se connecter à RabbitMQ après plusieurs essais.")
-                    raise e  # On fait planter l'app pour que Docker la redémarre
+                    logger.error("❌ Impossible de se connecter à RabbitMQ.")
+                    raise e
 
-                print(f"⚠️ RabbitMQ indisponible. Nouvelle tentative dans 5s... ({retries} essais restants)")
-                await asyncio.sleep(5)
+                logger.warning(
+                    f"⚠️ RabbitMQ indisponible. Nouvelle tentative dans {delay_s}s... ({retries} essais restants)"
+                )
+                await asyncio.sleep(delay_s)
 
         app.ctx.amqp_connection = connection
         app.ctx.amqp_channel = channel
-        app.ctx.hello_queue = queue_name
 
     @app.after_server_stop
     async def teardown(app):
-        # MQ close
-        if hasattr(app.ctx, "amqp_connection") and app.ctx.amqp_connection:
+        if getattr(app.ctx, "amqp_connection", None):
             await app.ctx.amqp_connection.close()
-
-        # DB close
         await app.ctx.engine.dispose()
 
     @app.get("/")
-    async def root(request):
+    async def root(_request):
         return json({"status": "ok", "service": "parking-reservation-api"})
 
     @app.get("/health")
-    async def health(request):
+    async def health(_request):
         return json({"status": "ok"})
 
     @app.post("/hello")
@@ -105,17 +121,20 @@ def create_app() -> Sanic:
                 )
             ).mappings().one()
 
-        # 2) Publish RabbitMQ
-        event = {"type": "HelloCreated", "id": row["id"], "message": row["message"]}
+        # 2) Publish RabbitMQ (si dispo)
+        if request.app.ctx.amqp_channel:
+            event = {"type": "HelloCreated", "id": row["id"], "message": row["message"]}
 
-        await request.app.ctx.amqp_channel.default_exchange.publish(
-            aio_pika.Message(
-                body=pyjson.dumps(event).encode("utf-8"),
-                content_type="application/json",
-                delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
-            ),
-            routing_key=request.app.ctx.hello_queue,  # queue name
-        )
+            await request.app.ctx.amqp_channel.default_exchange.publish(
+                aio_pika.Message(
+                    body=pyjson.dumps(event).encode("utf-8"),
+                    content_type="application/json",
+                    delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
+                ),
+                routing_key=request.app.ctx.hello_queue,
+            )
+        else:
+            logger.info("MQ not available -> skip publish")
 
         # 3) Réponse HTTP
         return json({"id": row["id"], "message": row["message"]})
