@@ -1,14 +1,14 @@
-FROM python:3.13-slim
+FROM public.ecr.aws/docker/library/python:3.13-slim
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends gcc build-essential \
- && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends gcc build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY requirements.txt .
 RUN python -m pip install --no-cache-dir --upgrade pip \
- && python -m pip install --no-cache-dir -r requirements.txt
+    && python -m pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 EXPOSE 8000

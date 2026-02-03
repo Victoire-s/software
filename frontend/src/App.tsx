@@ -1,6 +1,6 @@
 
 import './App.css'
-import ParkingReservationPage from './component/Parkingreservationpage';
+import ParkingReservationPage from './component/ParkingReservationPage';
 function App() {
 
   return (

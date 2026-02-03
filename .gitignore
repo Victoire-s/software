@@ -11,6 +11,12 @@ git
 dist
 dist-ssr
 *.local
+__pycache__
+venv
+*/__pycache__
+*/venv
+*/*/__pycache__
+*/*/venv
 
 # Editor directories and files
 .vscode/*
