@@ -64,6 +64,7 @@ async def register(request):
             "headers_to_use": {
                 "X-User-Id": str(created["id"]),
                 "X-User-Roles": ",".join(created.get("roles", [])),
+                "X-User-Email": created["email"],
             },
         }
         return json(to_jsonable(payload), status=201)
@@ -92,6 +93,7 @@ async def login(request):
             "headers_to_use": {
                 "X-User-Id": str(user["id"]),
                 "X-User-Roles": ",".join(user.get("roles", [])),
+                "X-User-Email": user["email"],
             },
         }
         return json(to_jsonable(payload))

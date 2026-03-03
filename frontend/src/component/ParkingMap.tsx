@@ -18,26 +18,28 @@ interface ParkingMapProps {
   selectedSpot: string | null;
   onSpotSelect: (spotId: string) => void;
   reservations: Reservation[];
+  availableSpots: { id: string }[];
   dateRange: DateRange;
   needsElectric: boolean;
 }
 
-const ParkingMap: React.FC<ParkingMapProps> = ({ 
-  selectedSpot, 
-  onSpotSelect, 
-  reservations, 
-  dateRange, 
-  needsElectric 
+const ParkingMap: React.FC<ParkingMapProps> = ({
+  selectedSpot,
+  onSpotSelect,
+  reservations,
+  availableSpots,
+  dateRange,
+  needsElectric
 }) => {
   const rows: string[] = ['A', 'B', 'C', 'D', 'E', 'F'];
   const spotsPerRow: number = 10;
-  
+
   const isElectricRow = (row: string): boolean => row === 'A' || row === 'F';
-  
+
   const isSpotReserved = (spotId: string): boolean => {
-    return reservations.some(r => 
-      r.spotId === spotId && 
-      r.date >= dateRange.startDate && 
+    return reservations.some(r =>
+      r.spotId === spotId &&
+      r.date >= dateRange.startDate &&
       r.date <= dateRange.endDate
     );
   };
@@ -47,9 +49,9 @@ const ParkingMap: React.FC<ParkingMapProps> = ({
     if (needsElectric && !isElectricRow(row)) {
       return false;
     }
-    
-    // Vérifier si la place n'est pas déjà réservée
-    return !isSpotReserved(spotId);
+
+    // Vérifier si la place est dans la liste des places disponibles renvoyées par le backend
+    return availableSpots.some(s => s.id === spotId);
   };
 
   const renderRow = (row: string): JSX.Element[] => {
@@ -60,7 +62,7 @@ const ParkingMap: React.FC<ParkingMapProps> = ({
       const hasElectric = isElectricRow(row);
       const isReserved = isSpotReserved(spotId);
       const isAvailable = isSpotAvailable(spotId, row);
-      
+
       spots.push(
         <ParkingSpot
           key={spotId}
@@ -103,7 +105,7 @@ const ParkingMap: React.FC<ParkingMapProps> = ({
       <div className="parking-grid">
         <div className="entry-marker">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-            <path d="M12 4L12 20M12 20L6 14M12 20L18 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M12 4L12 20M12 20L6 14M12 20L18 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
           <span>ENTRÉE</span>
         </div>
@@ -116,12 +118,12 @@ const ParkingMap: React.FC<ParkingMapProps> = ({
                 {renderRow(row)}
               </div>
             </div>
-            
+
             {/* Ajouter des espaces entre les paires de rangées */}
             {(index === 0 || index === 2 || index === 4) && (
               <div className="row-separator">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                  <path d="M4 12L20 12M20 12L14 6M20 12L14 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M4 12L20 12M20 12L14 6M20 12L14 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </div>
             )}
@@ -130,7 +132,7 @@ const ParkingMap: React.FC<ParkingMapProps> = ({
 
         <div className="exit-marker">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-            <path d="M12 20L12 4M12 4L6 10M12 4L18 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M12 20L12 4M12 4L6 10M12 4L18 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
           <span>SORTIE</span>
         </div>

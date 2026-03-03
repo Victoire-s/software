@@ -82,7 +82,7 @@ async def test_users_me_requires_auth(app):
 
 @pytest.mark.asyncio
 async def test_users_me_ok(app):
-    headers = {"X-User-Id": "12", "X-User-Roles": "EMPLOYEE"}
+    headers = {"X-User-Id": "12", "X-User-Roles": "EMPLOYEE", "X-User-Email": "test@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/users/me", headers=headers)
         assert res.status == 200
@@ -93,7 +93,7 @@ async def test_users_me_ok(app):
 
 @pytest.mark.asyncio
 async def test_users_me_not_found(app):
-    headers = {"X-User-Id": "404", "X-User-Roles": "EMPLOYEE"}
+    headers = {"X-User-Id": "404", "X-User-Roles": "EMPLOYEE", "X-User-Email": "test@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/users/me", headers=headers)
         assert res.status == 404
@@ -101,7 +101,7 @@ async def test_users_me_not_found(app):
 
 @pytest.mark.asyncio
 async def test_users_patch_me_rejects_unknown_field(app):
-    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE"}
+    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE", "X-User-Email": "test@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.patch("/users/me", headers=headers, json={"hack": "nope"})
         assert res.status == 400
@@ -109,7 +109,7 @@ async def test_users_patch_me_rejects_unknown_field(app):
 
 @pytest.mark.asyncio
 async def test_users_list_requires_secretary(app):
-    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE"}
+    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE", "X-User-Email": "test@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/users", headers=headers)
         assert res.status == 403
@@ -117,7 +117,7 @@ async def test_users_list_requires_secretary(app):
 
 @pytest.mark.asyncio
 async def test_users_list_ok_for_secretary(app):
-    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE"}
+    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE", "X-User-Email": "secretaire@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/users", headers=headers)
         assert res.status == 200
@@ -126,7 +126,7 @@ async def test_users_list_ok_for_secretary(app):
 
 @pytest.mark.asyncio
 async def test_users_create_ok_for_secretary_normalizes_roles(app):
-    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE"}
+    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE", "X-User-Email": "secretaire@company.com"}
     payload = {"email": "a@b.com", "nom": "Dupont", "prenom": "Jean", "roles": ["employee"]}
 
     async with app.asgi_client as client:

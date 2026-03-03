@@ -62,6 +62,23 @@ class ParkingRepository:
             )
         ).scalar_one()
 
+        # Get No-shows (reserved but not checked in today before 11AM)
+        # Using a raw query or joining with reservations
+        from db import reservations_table
+        from datetime import datetime
+        now = datetime.now()
+        
+        # Reservations for today that are not checked in
+        no_shows = (
+            await self.session.execute(
+                select(func.count()).select_from(reservations_table).where(
+                    reservations_table.c.start_date <= now,
+                    reservations_table.c.end_date >= now.replace(hour=0, minute=0, second=0),
+                    reservations_table.c.checked_in.is_(False)
+                )
+            )
+        ).scalar_one()
+
         slots_max = cfg["slots_max"] or 60
         occupation_rate = (occupied / slots_max) if slots_max else 0.0
 
@@ -73,4 +90,5 @@ class ParkingRepository:
             "occupation_rate": occupation_rate,
             "electric_spots": electric,
             "electric_ratio": (electric / slots_max) if slots_max else 0.0,
+            "no_shows": no_shows,
         }

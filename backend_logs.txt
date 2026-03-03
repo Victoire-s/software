@@ -1,0 +1,311 @@
+failed to get console mode for stdout: The handle is invalid.
+backend-1  | Main  2026-03-03 13:45:44 +0000 INFO: Sanic v25.12.0
+backend-1  | Main  2026-03-03 13:45:44 +0000 INFO: Goin' Fast @ http://0.0.0.0:8000
+backend-1  | Main  2026-03-03 13:45:44 +0000 INFO: app: parking-reservation-api
+backend-1  | Main  2026-03-03 13:45:44 +0000 INFO: mode: production, single worker
+backend-1  | Main  2026-03-03 13:45:44 +0000 INFO: server: sanic, HTTP/1.1
+backend-1  | Main  2026-03-03 13:45:44 +0000 INFO: python: 3.13.12
+backend-1  | Main  2026-03-03 13:45:44 +0000 INFO: platform: Linux-5.15.133.1-microsoft-standard-WSL2-x86_64-with-glibc2.41
+backend-1  | Main  2026-03-03 13:45:44 +0000 INFO: auto-reload: enabled
+backend-1  | Main  2026-03-03 13:45:44 +0000 INFO: packages: sanic-routing==23.12.0, sanic-testing==24.6.0
+backend-1  | Srv 0 2026-03-03 13:45:45 +0000 INFO: Starting worker [16]
+backend-1  | Srv 0 2026-03-03 13:45:45 +0000 INFO: APScheduler started
+backend-1  | Srv 0 2026-03-03 13:45:45 +0000 INFO: Tentative de connexion à RabbitMQ (amqp://guest:guest@rabbitmq:5672/)...
+backend-1  | Srv 0 2026-03-03 13:45:45 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 13:45:45 +0000 INFO: ✅ Connecté à RabbitMQ avec succès !
+backend-1  | Srv 0 2026-03-03 13:45:45 +0000 INFO: Worker ready [16]
+backend-1  | Srv 0 2026-03-03 13:47:40 +0000 ERROR: Exception occurred while handling uri: 'http://localhost:8000/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 31, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 77, in my_reservations
+backend-1  |     user_email = request.ctx.user["email"]
+backend-1  |                  ^^^^^^^^^^^^^^^^
+backend-1  | AttributeError: 'types.SimpleNamespace' object has no attribute 'user'
+backend-1  | Srv 0 2026-03-03 13:47:40 +0000 ERROR: Exception occurred while handling uri: 'http://localhost:8000/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 31, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 77, in my_reservations
+backend-1  |     user_email = request.ctx.user["email"]
+backend-1  |                  ^^^^^^^^^^^^^^^^
+backend-1  | AttributeError: 'types.SimpleNamespace' object has no attribute 'user'
+backend-1  | Srv 0 2026-03-03 13:47:49 +0000 ERROR: Exception occurred while handling uri: 'http://localhost:8000/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 31, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 77, in my_reservations
+backend-1  |     user_email = request.ctx.user["email"]
+backend-1  |                  ^^^^^^^^^^^^^^^^
+backend-1  | AttributeError: 'types.SimpleNamespace' object has no attribute 'user'
+backend-1  | Srv 0 2026-03-03 13:48:16 +0000 ERROR: Exception occurred while handling uri: 'http://localhost:8000/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 31, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 77, in my_reservations
+backend-1  |     user_email = request.ctx.user["email"]
+backend-1  |                  ^^^^^^^^^^^^^^^^
+backend-1  | AttributeError: 'types.SimpleNamespace' object has no attribute 'user'
+backend-1  | Srv 0 2026-03-03 13:48:16 +0000 ERROR: Exception occurred while handling uri: 'http://localhost:8000/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 31, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 77, in my_reservations
+backend-1  |     user_email = request.ctx.user["email"]
+backend-1  |                  ^^^^^^^^^^^^^^^^
+backend-1  | AttributeError: 'types.SimpleNamespace' object has no attribute 'user'
+backend-1  | Srv 0 2026-03-03 13:50:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 13:55:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:00:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:03:53 +0000 ERROR: Exception occurred while handling uri: 'http://localhost/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 31, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 77, in my_reservations
+backend-1  |     user_email = request.ctx.user["email"]
+backend-1  |                  ^^^^^^^^^^^^^^^^
+backend-1  | AttributeError: 'types.SimpleNamespace' object has no attribute 'user'
+backend-1  | Srv 0 2026-03-03 14:03:58 +0000 ERROR: Exception occurred while handling uri: 'http://localhost/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 31, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 77, in my_reservations
+backend-1  |     user_email = request.ctx.user["email"]
+backend-1  |                  ^^^^^^^^^^^^^^^^
+backend-1  | AttributeError: 'types.SimpleNamespace' object has no attribute 'user'
+backend-1  | Srv 0 2026-03-03 14:05:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:10:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:15:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:20:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:25:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:30:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:35:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:40:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:45:46 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:46:52 +0000 INFO: Stopping worker [16]
+backend-1  | Srv 0 2026-03-03 14:46:53 +0000 INFO: Worker complete [16]
+backend-1  | Task was destroyed but it is pending!
+backend-1  | task: <Task pending name='Task-4' coro=<Sanic._prep_task.<locals>.do() running at /usr/local/lib/python3.13/site-packages/sanic/app.py:1651> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+backend-1  | Srv 0 2026-03-03 14:46:57 +0000 INFO: Starting worker [24]
+backend-1  | Srv 0 2026-03-03 14:46:57 +0000 INFO: APScheduler started
+backend-1  | Srv 0 2026-03-03 14:46:58 +0000 INFO: Tentative de connexion à RabbitMQ (amqp://guest:guest@rabbitmq:5672/)...
+backend-1  | Srv 0 2026-03-03 14:46:58 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:46:58 +0000 INFO: ✅ Connecté à RabbitMQ avec succès !
+backend-1  | Srv 0 2026-03-03 14:46:58 +0000 INFO: Worker ready [24]
+backend-1  | Srv 0 2026-03-03 14:47:05 +0000 INFO: Stopping worker [24]
+backend-1  | Srv 0 2026-03-03 14:47:05 +0000 INFO: Worker complete [24]
+backend-1  | Task was destroyed but it is pending!
+backend-1  | task: <Task pending name='Task-4' coro=<Sanic._prep_task.<locals>.do() done, defined at /usr/local/lib/python3.13/site-packages/sanic/app.py:1643> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+backend-1  | Srv 0 2026-03-03 14:47:06 +0000 INFO: Starting worker [31]
+backend-1  | Srv 0 2026-03-03 14:47:06 +0000 INFO: APScheduler started
+backend-1  | Srv 0 2026-03-03 14:47:06 +0000 INFO: Tentative de connexion à RabbitMQ (amqp://guest:guest@rabbitmq:5672/)...
+backend-1  | Srv 0 2026-03-03 14:47:06 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:47:06 +0000 INFO: ✅ Connecté à RabbitMQ avec succès !
+backend-1  | Srv 0 2026-03-03 14:47:06 +0000 INFO: Worker ready [31]
+backend-1  | Srv 0 2026-03-03 14:47:16 +0000 INFO: Stopping worker [31]
+backend-1  | Srv 0 2026-03-03 14:47:16 +0000 INFO: Worker complete [31]
+backend-1  | Task was destroyed but it is pending!
+backend-1  | task: <Task pending name='Task-4' coro=<Sanic._prep_task.<locals>.do() done, defined at /usr/local/lib/python3.13/site-packages/sanic/app.py:1643> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+backend-1  | Srv 0 2026-03-03 14:47:17 +0000 INFO: Starting worker [38]
+backend-1  | Srv 0 2026-03-03 14:47:17 +0000 INFO: APScheduler started
+backend-1  | Srv 0 2026-03-03 14:47:17 +0000 INFO: Tentative de connexion à RabbitMQ (amqp://guest:guest@rabbitmq:5672/)...
+backend-1  | Srv 0 2026-03-03 14:47:17 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:47:17 +0000 INFO: ✅ Connecté à RabbitMQ avec succès !
+backend-1  | Srv 0 2026-03-03 14:47:17 +0000 INFO: Worker ready [38]
+backend-1  | Srv 0 2026-03-03 14:52:17 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 14:57:17 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:02:17 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:07:17 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:12:17 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:17:17 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:22:17 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:27:18 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:32:18 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:37:18 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:43:51 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:48:51 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:53:51 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 15:58:51 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 16:03:51 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 16:08:51 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 19:50:33 +0000 ERROR: Exception occurred while handling uri: 'http://localhost/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 31, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 77, in my_reservations
+backend-1  |     user_email = request.ctx.user["email"]
+backend-1  |                  ^^^^^^^^^^^^^^^^
+backend-1  | AttributeError: 'types.SimpleNamespace' object has no attribute 'user'
+backend-1  | Srv 0 2026-03-03 19:51:29 +0000 INFO: Stopping worker [38]
+backend-1  | Srv 0 2026-03-03 19:51:29 +0000 INFO: Worker complete [38]
+backend-1  | Task was destroyed but it is pending!
+backend-1  | task: <Task pending name='Task-4' coro=<Sanic._prep_task.<locals>.do() running at /usr/local/lib/python3.13/site-packages/sanic/app.py:1651> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+backend-1  | Srv 0 2026-03-03 19:51:31 +0000 INFO: Starting worker [45]
+backend-1  | Srv 0 2026-03-03 19:51:31 +0000 INFO: APScheduler started
+backend-1  | Srv 0 2026-03-03 19:51:31 +0000 INFO: Tentative de connexion à RabbitMQ (amqp://guest:guest@rabbitmq:5672/)...
+backend-1  | Srv 0 2026-03-03 19:51:31 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 19:51:31 +0000 INFO: ✅ Connecté à RabbitMQ avec succès !
+backend-1  | Srv 0 2026-03-03 19:51:31 +0000 INFO: Worker ready [45]
+backend-1  | Srv 0 2026-03-03 19:51:34 +0000 INFO: Stopping worker [45]
+backend-1  | Srv 0 2026-03-03 19:51:34 +0000 INFO: Worker complete [45]
+backend-1  | Task was destroyed but it is pending!
+backend-1  | task: <Task pending name='Task-4' coro=<Sanic._prep_task.<locals>.do() done, defined at /usr/local/lib/python3.13/site-packages/sanic/app.py:1643> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+backend-1  | Srv 0 2026-03-03 19:51:36 +0000 INFO: Starting worker [52]
+backend-1  | Srv 0 2026-03-03 19:51:36 +0000 INFO: APScheduler started
+backend-1  | Srv 0 2026-03-03 19:51:36 +0000 INFO: Tentative de connexion à RabbitMQ (amqp://guest:guest@rabbitmq:5672/)...
+backend-1  | Srv 0 2026-03-03 19:51:36 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 19:51:36 +0000 INFO: ✅ Connecté à RabbitMQ avec succès !
+backend-1  | Srv 0 2026-03-03 19:51:36 +0000 INFO: Worker ready [52]
+backend-1  | Srv 0 2026-03-03 19:51:47 +0000 INFO: Stopping worker [52]
+backend-1  | Srv 0 2026-03-03 19:51:47 +0000 INFO: Worker complete [52]
+backend-1  | Task was destroyed but it is pending!
+backend-1  | task: <Task pending name='Task-4' coro=<Sanic._prep_task.<locals>.do() done, defined at /usr/local/lib/python3.13/site-packages/sanic/app.py:1643> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+backend-1  | Srv 0 2026-03-03 19:51:48 +0000 INFO: Starting worker [59]
+backend-1  | Srv 0 2026-03-03 19:51:48 +0000 INFO: APScheduler started
+backend-1  | Srv 0 2026-03-03 19:51:48 +0000 INFO: Tentative de connexion à RabbitMQ (amqp://guest:guest@rabbitmq:5672/)...
+backend-1  | Srv 0 2026-03-03 19:51:48 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 19:51:48 +0000 INFO: ✅ Connecté à RabbitMQ avec succès !
+backend-1  | Srv 0 2026-03-03 19:51:48 +0000 INFO: Worker ready [59]
+backend-1  | Srv 0 2026-03-03 19:56:48 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 20:01:48 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 20:06:48 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 20:11:15 +0000 ERROR: Exception occurred while handling uri: 'http://localhost/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 46, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 84, in my_reservations
+backend-1  |     reservations = await service.get_my_reservations(user_email)
+backend-1  |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/services/reservation_service.py", line 125, in get_my_reservations
+backend-1  |     return await self.reservation_repo.get_by_user(user.id)
+backend-1  |                                                    ^^^^^^^
+backend-1  | AttributeError: 'dict' object has no attribute 'id'
+backend-1  | Srv 0 2026-03-03 20:11:43 +0000 ERROR: Exception occurred while handling uri: 'http://localhost/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 46, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 84, in my_reservations
+backend-1  |     reservations = await service.get_my_reservations(user_email)
+backend-1  |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/services/reservation_service.py", line 125, in get_my_reservations
+backend-1  |     return await self.reservation_repo.get_by_user(user.id)
+backend-1  |                                                    ^^^^^^^
+backend-1  | AttributeError: 'dict' object has no attribute 'id'
+backend-1  | Srv 0 2026-03-03 20:11:48 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 20:16:48 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 20:18:15 +0000 ERROR: Exception occurred while handling uri: 'http://localhost/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 46, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 84, in my_reservations
+backend-1  |     reservations = await service.get_my_reservations(user_email)
+backend-1  |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/services/reservation_service.py", line 125, in get_my_reservations
+backend-1  |     return await self.reservation_repo.get_by_user(user.id)
+backend-1  |                                                    ^^^^^^^
+backend-1  | AttributeError: 'dict' object has no attribute 'id'
+backend-1  | Srv 0 2026-03-03 20:19:41 +0000 INFO: Stopping worker [59]
+backend-1  | Srv 0 2026-03-03 20:19:41 +0000 INFO: Worker complete [59]
+backend-1  | Task was destroyed but it is pending!
+backend-1  | task: <Task pending name='Task-4' coro=<Sanic._prep_task.<locals>.do() running at /usr/local/lib/python3.13/site-packages/sanic/app.py:1651> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+backend-1  | Srv 0 2026-03-03 20:19:43 +0000 INFO: Starting worker [160]
+backend-1  | Srv 0 2026-03-03 20:19:43 +0000 INFO: APScheduler started
+backend-1  | Srv 0 2026-03-03 20:19:43 +0000 INFO: Tentative de connexion à RabbitMQ (amqp://guest:guest@rabbitmq:5672/)...
+backend-1  | Srv 0 2026-03-03 20:19:43 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 20:19:43 +0000 INFO: ✅ Connecté à RabbitMQ avec succès !
+backend-1  | Srv 0 2026-03-03 20:19:43 +0000 INFO: Worker ready [160]
+backend-1  | Main  2026-03-03 20:22:35 +0000 INFO: Received signal SIGTERM. Shutting down.
+backend-1  | Srv 0 2026-03-03 20:22:35 +0000 INFO: Stopping worker [160]
+backend-1  | Srv 0 2026-03-03 20:22:35 +0000 INFO: Worker complete [160]
+backend-1  | Task was destroyed but it is pending!
+backend-1  | task: <Task pending name='Task-4' coro=<Sanic._prep_task.<locals>.do() done, defined at /usr/local/lib/python3.13/site-packages/sanic/app.py:1643> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+backend-1  | Main  2026-03-03 20:22:37 +0000 INFO: Server Stopped
+backend-1  | Main  2026-03-03 20:22:41 +0000 INFO: Sanic v25.12.0
+backend-1  | Main  2026-03-03 20:22:41 +0000 INFO: Goin' Fast @ http://0.0.0.0:8000
+backend-1  | Main  2026-03-03 20:22:41 +0000 INFO: app: parking-reservation-api
+backend-1  | Main  2026-03-03 20:22:41 +0000 INFO: mode: production, single worker
+backend-1  | Main  2026-03-03 20:22:41 +0000 INFO: server: sanic, HTTP/1.1
+backend-1  | Main  2026-03-03 20:22:41 +0000 INFO: python: 3.13.12
+backend-1  | Main  2026-03-03 20:22:41 +0000 INFO: platform: Linux-5.15.133.1-microsoft-standard-WSL2-x86_64-with-glibc2.41
+backend-1  | Main  2026-03-03 20:22:41 +0000 INFO: auto-reload: enabled
+backend-1  | Main  2026-03-03 20:22:41 +0000 INFO: packages: sanic-routing==23.12.0, sanic-testing==24.6.0
+backend-1  | Srv 0 2026-03-03 20:22:43 +0000 INFO: Starting worker [16]
+backend-1  | Srv 0 2026-03-03 20:22:43 +0000 INFO: APScheduler started
+backend-1  | Srv 0 2026-03-03 20:22:43 +0000 INFO: Tentative de connexion à RabbitMQ (amqp://guest:guest@rabbitmq:5672/)...
+backend-1  | Srv 0 2026-03-03 20:22:43 +0000 INFO: Released 0 unchecked reservations
+backend-1  | Srv 0 2026-03-03 20:22:43 +0000 INFO: ✅ Connecté à RabbitMQ avec succès !
+backend-1  | Srv 0 2026-03-03 20:22:43 +0000 INFO: Worker ready [16]
+backend-1  | Srv 0 2026-03-03 20:23:24 +0000 ERROR: Exception occurred while handling uri: 'http://localhost/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 46, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 84, in my_reservations
+backend-1  |     reservations = await service.get_my_reservations(user_email)
+backend-1  |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/services/reservation_service.py", line 125, in get_my_reservations
+backend-1  |     return await self.reservation_repo.get_by_user(user.id)
+backend-1  |                                                    ^^^^^^^
+backend-1  | AttributeError: 'dict' object has no attribute 'id'
+backend-1  | Srv 0 2026-03-03 20:23:30 +0000 ERROR: Exception occurred while handling uri: 'http://localhost/reservations/me'
+backend-1  | Traceback (most recent call last):
+backend-1  |   File "handle_request", line 99, in handle_request
+backend-1  |     Extend = TypeVar("Extend", type)  # type: ignore
+backend-1  |                        ^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/security.py", line 46, in wrapper
+backend-1  |     return await handler(request, *args, **kwargs)
+backend-1  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/routes/reservations_controller.py", line 84, in my_reservations
+backend-1  |     reservations = await service.get_my_reservations(user_email)
+backend-1  |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1  |   File "/app/services/reservation_service.py", line 125, in get_my_reservations
+backend-1  |     return await self.reservation_repo.get_by_user(user.id)
+backend-1  |                                                    ^^^^^^^
+backend-1  | AttributeError: 'dict' object has no attribute 'id'

@@ -20,14 +20,29 @@ def get_user_id(request) -> int:
         raise Unauthorized("Invalid X-User-Id header")
 
 
+def get_user_email(request) -> str:
+    email = request.headers.get("X-User-Email", "").strip().lower()
+    if not email:
+        raise Unauthorized("Missing X-User-Email header")
+    return email
+
+
+def _populate_ctx(request):
+    roles = parse_roles(request)
+    if not roles:
+        raise Unauthorized("Missing X-User-Roles header")
+    user_id = get_user_id(request)
+    email = get_user_email(request)
+    request.ctx.user_roles = roles
+    request.ctx.user_id = user_id
+    request.ctx.user = {"id": user_id, "email": email, "roles": roles}
+    return roles
+
+
 def require_auth(handler):
     @wraps(handler)
     async def wrapper(request, *args, **kwargs):
-        roles = parse_roles(request)
-        if not roles:
-            raise Unauthorized("Missing X-User-Roles header")
-        request.ctx.user_roles = roles
-        request.ctx.user_id = get_user_id(request)
+        _populate_ctx(request)
         return await handler(request, *args, **kwargs)
 
     return wrapper
@@ -39,13 +54,9 @@ def require_roles(*required_roles: str):
     def decorator(handler):
         @wraps(handler)
         async def wrapper(request, *args, **kwargs):
-            roles = parse_roles(request)
-            if not roles:
-                raise Unauthorized("Missing X-User-Roles header")
+            roles = _populate_ctx(request)
             if roles.isdisjoint(required):
                 raise Forbidden("Insufficient role")
-            request.ctx.user_roles = roles
-            request.ctx.user_id = get_user_id(request)
             return await handler(request, *args, **kwargs)
 
         return wrapper

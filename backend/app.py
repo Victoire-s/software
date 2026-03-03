@@ -11,11 +11,13 @@ from sanic.exceptions import InvalidUsage
 from sanic.log import logger
 
 from sqlalchemy import insert, select
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from routes.auth_controller import bp_auth   # ✅ AJOUT
 from routes.users_controller import bp_users
 from routes.spots_controller import bp_spots
 from routes.parking_controller import bp_parking
+from routes.reservations_controller import bp_reservations # ✅ AJOUT
 
 from db import make_engine, make_session_factory, init_db, hello_table
 
@@ -33,6 +35,7 @@ def create_app() -> Sanic:
     app.blueprint(bp_users)
     app.blueprint(bp_spots)
     app.blueprint(bp_parking)
+    app.blueprint(bp_reservations) # ✅ AJOUT
 
     # --- DB ---
     engine = make_engine()
@@ -53,9 +56,66 @@ def create_app() -> Sanic:
         app.ctx.engine = engine
         app.ctx.Session = Session
 
+        # Auto-seed spots if empty
+        async with app.ctx.Session() as session:
+            from db import spots_table
+            res = await session.execute(select(spots_table.c.id).limit(1))
+            if res.first() is None:
+                logger.info("Initializing DB with 60 default parking spots...")
+                values = []
+                for row in ['A', 'B', 'C', 'D', 'E', 'F']:
+                    for i in range(1, 11):
+                        spot_id = f'{row}{i:02d}'
+                        electrical = True if row in ('A', 'F') else False
+                        values.append({'id': spot_id, 'is_free': True, 'electrical': electrical})
+                await session.execute(insert(spots_table).values(values))
+                await session.commit()
+                logger.info("DB seeded successfully!")
+
         # MQ init (optionnel)
         app.ctx.amqp_connection = None
         app.ctx.amqp_channel = None
+        app.ctx.hello_queue = queue_name
+
+        # Setup APScheduler
+        app.ctx.scheduler = AsyncIOScheduler()
+
+        async def release_expired_checkins_job():
+            logger.info("Executing scheduled task: release_expired_checkins")
+            try:
+                # We need a session + repositories for this
+                from repositories.reservation_repository import ReservationRepository
+                from repositories.spot_repository import SpotRepository
+                from repositories.user_repository import UserRepository
+                from services.reservation_service import ReservationService
+                
+                async with app.ctx.Session() as session:
+                    reservation_repo = ReservationRepository(session)
+                    spot_repo = SpotRepository(session)
+                    user_repo = UserRepository(session)
+                    
+                    service = ReservationService(
+                        session, reservation_repo, spot_repo, user_repo, 
+                        app.ctx.amqp_channel, app.ctx.hello_queue
+                    )
+                    await service.release_expired_checkins()
+            except Exception as e:
+                logger.error(f"Error in release_expired_checkins_job: {e}")
+
+        # Add the job to run every day at 11:01 AM (to give a tiny grace period, or exactly at 11:00)
+        app.ctx.scheduler.add_job(
+            release_expired_checkins_job,
+            'cron',
+            hour=11,
+            minute=0,
+            id='release_expired_checkins_11am',
+            replace_existing=True
+        )
+        app.ctx.scheduler.start()
+        logger.info("APScheduler started")
+
+        from run_background import start_cleanup_task
+        app.add_task(start_cleanup_task(app))
         app.ctx.hello_queue = queue_name
 
         if not mq_enabled:
@@ -95,6 +155,8 @@ def create_app() -> Sanic:
 
     @app.after_server_stop
     async def teardown(app):
+        if hasattr(app.ctx, "scheduler") and app.ctx.scheduler.running:
+            app.ctx.scheduler.shutdown()
         if getattr(app.ctx, "amqp_connection", None):
             await app.ctx.amqp_connection.close()
         await app.ctx.engine.dispose()

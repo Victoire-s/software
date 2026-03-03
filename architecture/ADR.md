@@ -76,3 +76,23 @@ Pour ces deux service, l'expérience d''équipe nous a guidé vers le choix de c
 - Evolution vers microservice + couteux
 - Manque d'une application mobile: complexifie l'utilisation.
 - React est complexe au débugage.
+
+---
+
+## **Règles métier — Durée de réservation**
+
+### Décision : jours ouvrables pour les employés, jours calendaires pour les managers
+
+**Employés (EMPLOYEE)**
+- La durée maximale d'une réservation est de **5 jours ouvrables** (lundi au vendredi inclus).
+- Les week-ends ne sont pas comptés : une réservation du lundi au lundi suivant représente 6 jours ouvrables et est donc refusée.
+- Implémentation : fonction `_count_working_days(start, end)` côté backend (Python, `timedelta` itératif) et `countWorkingDays(start, end)` côté frontend (JavaScript, `Date.getDay()`).
+
+**Managers (MANAGER)**
+- La durée maximale est de **30 jours calendaires** (semaines + week-ends inclus).
+
+**Justification**
+- Le parking est un équipement professionnel ; les réservations n'ont de sens que les jours de travail.
+- Autoriser une réservation « du lundi au lundi » aurait représenté 8 jours calendaires pour seulement 6 jours de présence potentielle, ce qui aurait été incohérent avec la règle des 5 jours.
+- Les fériés ne sont pas gérés dans cette version (hors périmètre initial, périmètre entreprise France uniquement).
+

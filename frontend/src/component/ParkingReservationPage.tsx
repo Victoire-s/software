@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import ParkingMap from './ParkingMap';
 import ReservationPanel from './ReservationPanel';
 import UserReservations from './UserReservations';
+import ManagerDashboard from './ManagerDashboard';
+import AdminPanel from './AdminPanel';
 import './ParkingReservationPage.css';
 import { parkingApi, ParkingSpot, User } from '../services/api';
 
@@ -13,7 +15,7 @@ interface Reservation {
 }
 
 interface UserReservation {
-  id: string;
+  id: number;
   spotId: string;
   startDate: string;
   endDate: string;
@@ -25,7 +27,11 @@ interface DateRange {
   endDate: string;
 }
 
-const ParkingReservationPage: React.FC = () => {
+interface ParkingReservationPageProps {
+  onLogout: () => void;
+}
+
+const ParkingReservationPage: React.FC<ParkingReservationPageProps> = ({ onLogout }) => {
   const [selectedSpot, setSelectedSpot] = useState<string | null>(null);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [userReservations, setUserReservations] = useState<UserReservation[]>([]);
@@ -36,70 +42,44 @@ const ParkingReservationPage: React.FC = () => {
   const [needsElectric, setNeedsElectric] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [availableSpots, setAvailableSpots] = useState<ParkingSpot[]>([]);
 
-  // Auto-login test user on mount
+  // Component mount: Just rely on loadData since we are authenticated
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        console.log("Attempting auto-login...");
-        const user = await parkingApi.login("test@test.com");
-        console.log("Logged in as:", user);
-        setCurrentUser(user.user);
-      } catch (e: any) {
-        console.error("Auto-login failed", e);
-        if (e.response && e.response.status === 401) {
-          // Try register if login fails (first run)
-          try {
-            console.log("Login failed, trying register...");
-            const reg = await parkingApi.register("test@test.com", "Test", "User");
-            setCurrentUser(reg.user);
-          } catch (regError) {
-            console.error("Register failed", regError);
-          }
-        }
-      }
-    };
-    initAuth();
-  }, []);
+    loadData();
+  }, [dateRange.startDate, dateRange.endDate, needsElectric]);
 
-  // Fetch spots when user or dependencies change
-  useEffect(() => {
-    if (currentUser) {
-      loadData();
-    }
-  }, [dateRange, currentUser, needsElectric]);
+  // Removed redundant useEffect to prevent double fetching
 
   const loadData = async () => {
     try {
       setLoading(true);
       // 1. Get available spots
       const spots: ParkingSpot[] = await parkingApi.getAvailableSpots(needsElectric);
-      console.log("Available spots:", spots);
+      setAvailableSpots(spots);
 
       // 2. Refresh user profile (to get current reservation)
       const me = await parkingApi.getMe();
       setCurrentUser(me);
 
-      
-      if (me.spot_associe) {
-        setUserReservations([{
-          id: 'my-res',
-          spotId: me.spot_associe,
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
-          checkedIn: true
-        }]);
+      // Refresh user reservations
+      const myReservations = await parkingApi.getMyReservations();
+      const mappedMyRes = myReservations.map((r: any) => ({
+        id: r.id,
+        spotId: r.spot_id,
+        startDate: r.start_date.split('T')[0],
+        endDate: r.end_date.split('T')[0],
+        checkedIn: r.checked_in
+      }));
+      setUserReservations(mappedMyRes);
 
-        setReservations([{
-          spotId: me.spot_associe,
-          date: dateRange.startDate,
-          userId: String(me.id),
-          checkedIn: true
-        }]);
-      } else {
-        setUserReservations([]);
-        setReservations([]);
-      }
+      // (We could also fetch ALL reservations to show on map, but for now we only show User reservations and what "spots" are free)
+      setReservations(mappedMyRes.map((r: any) => ({
+        spotId: r.spotId,
+        date: r.startDate,
+        userId: String(me.id),
+        checkedIn: r.checkedIn
+      })));
 
     } catch (e) {
       console.error("Error loading data", e);
@@ -121,36 +101,50 @@ const ParkingReservationPage: React.FC = () => {
     setLoading(true);
 
     try {
-      if (currentUser?.spot_associe) {
-        alert("Vous avez déjà une réservation. Veuillez d'abord l'annuler.");
+      // Check for overlap on frontend (optional since backend will do it, but good practice to prevent spam)
+      const isReserved = userReservations.some(r =>
+        (r.startDate <= dateRange.endDate && r.endDate >= dateRange.startDate)
+      );
+
+      if (isReserved) {
+        alert("Vous avez déjà une réservation qui chevauche ces dates.");
         return;
       }
 
-      await parkingApi.reserveSpot(selectedSpot);
+      await parkingApi.reserveSpot(selectedSpot, dateRange.startDate, dateRange.endDate);
 
       alert(`Réservation confirmée pour la place ${selectedSpot}`);
       setSelectedSpot(null);
       await loadData();
-    } catch (error) {
-      alert('Erreur lors de la réservation');
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Erreur lors de la réservation');
       console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelReservation = async (reservationId: string): Promise<void> => {
-    if (!window.confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
-      return;
-    }
-
+  const handleCancelReservation = async (reservationId: number): Promise<void> => {
     try {
-      await parkingApi.cancelReservation();
-      alert('Réservation annulée');
+      setLoading(true);
+      await parkingApi.cancelReservation(reservationId);
+      alert('Réservation annulée avec succès.');
       await loadData();
-    } catch (error) {
-      alert('Erreur lors de l\'annulation');
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Erreur lors de l\'annulation de la réservation');
       console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCheckIn = async (reservationId: number): Promise<void> => {
+    try {
+      await parkingApi.checkinReservation(reservationId);
+      alert('Check-in réussi !');
+      await loadData();
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Erreur lors du check-in');
     }
   };
 
@@ -168,7 +162,10 @@ const ParkingReservationPage: React.FC = () => {
           ) : (
             <span className="user-name">Chargement...</span>
           )}
-          <button className="btn-logout" onClick={() => window.location.reload()}>Déconnexion</button>
+          <button className="btn-logout" onClick={() => {
+            parkingApi.logout();
+            onLogout();
+          }}>Déconnexion</button>
         </div>
       </header>
 
@@ -178,6 +175,7 @@ const ParkingReservationPage: React.FC = () => {
             selectedSpot={selectedSpot}
             onSpotSelect={handleSpotSelect}
             reservations={reservations}
+            availableSpots={availableSpots}
             dateRange={dateRange}
             needsElectric={needsElectric}
           />
@@ -192,13 +190,26 @@ const ParkingReservationPage: React.FC = () => {
             onNeedsElectricChange={setNeedsElectric}
             onReserve={handleReservation}
             loading={loading}
+            currentUserRole={currentUser?.roles?.includes('MANAGER') ? 'MANAGER' : 'EMPLOYEE'}
           />
 
           <UserReservations
             reservations={userReservations}
             onCancel={handleCancelReservation}
+            onCheckIn={handleCheckIn}
           />
         </aside>
+      </div>
+
+      {/* Admin / Manager views pushed below the main grid */}
+      <div className="admin-views">
+        {currentUser?.roles?.includes('MANAGER') && (
+          <ManagerDashboard />
+        )}
+
+        {currentUser?.roles?.includes('SECRETAIRE') && (
+          <AdminPanel />
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import './UserReservations.css';
 
 interface UserReservation {
-  id: string;
+  id: number;
   spotId: string;
   startDate: string;
   endDate: string;
@@ -11,10 +11,11 @@ interface UserReservation {
 
 interface UserReservationsProps {
   reservations: UserReservation[];
-  onCancel: (reservationId: string) => void;
+  onCancel: (reservationId: number) => void;
+  onCheckIn: (reservationId: number) => void;
 }
 
-const UserReservations: React.FC<UserReservationsProps> = ({ reservations, onCancel }) => {
+const UserReservations: React.FC<UserReservationsProps> = ({ reservations, onCancel, onCheckIn }) => {
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
@@ -41,10 +42,8 @@ const UserReservations: React.FC<UserReservationsProps> = ({ reservations, onCan
     return isToday(reservation.startDate) && !reservation.checkedIn;
   };
 
-  const handleCheckIn = (reservationId: string): void => {
-    // TODO: Implémenter le check-in via API
-    // window.location.href = `/checkin/${reservationId}`;
-    alert('Fonctionnalité de check-in à venir (via QR code)');
+  const handleCheckIn = (reservationId: number): void => {
+    onCheckIn(reservationId);
   };
 
   if (!reservations || reservations.length === 0) {
@@ -61,11 +60,11 @@ const UserReservations: React.FC<UserReservationsProps> = ({ reservations, onCan
   return (
     <div className="user-reservations">
       <h3>Mes Réservations</h3>
-      
+
       <div className="reservations-list">
         {reservations.map((reservation) => (
-          <div 
-            key={reservation.id} 
+          <div
+            key={reservation.id}
             className={`reservation-card ${isPast(reservation.endDate) ? 'past' : ''}`}
           >
             <div className="reservation-header">
@@ -97,16 +96,16 @@ const UserReservations: React.FC<UserReservationsProps> = ({ reservations, onCan
 
             <div className="reservation-actions">
               {canCheckIn(reservation) && (
-                <button 
+                <button
                   className="btn-secondary btn-checkin"
                   onClick={() => handleCheckIn(reservation.id)}
                 >
                   Check-in
                 </button>
               )}
-              
+
               {!isPast(reservation.endDate) && (
-                <button 
+                <button
                   className="btn-danger btn-cancel"
                   onClick={() => onCancel(reservation.id)}
                 >
@@ -120,7 +119,7 @@ const UserReservations: React.FC<UserReservationsProps> = ({ reservations, onCan
 
       <div className="reservation-info">
         <p className="info-text">
-          ⚠️ <strong>Important:</strong> Effectuez votre check-in avant 11h le jour de votre réservation, 
+          ⚠️ <strong>Important:</strong> Effectuez votre check-in avant 11h le jour de votre réservation,
           sinon votre place sera libérée automatiquement.
         </p>
       </div>

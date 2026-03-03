@@ -27,6 +27,17 @@ export interface ParkingSpot {
     reserved_to?: string; // ISO
 }
 
+export interface Reservation {
+    id: number;
+    spot_id: string;
+    user_id: number;
+    start_date: string;
+    end_date: string;
+    checked_in: boolean;
+    created_at: string;
+}
+
+
 // Store auth headers
 let authHeaders: Record<string, string> = {};
 
@@ -43,6 +54,10 @@ export const parkingApi = {
             setAuthHeaders(response.data.headers_to_use);
         }
         return response.data;
+    },
+
+    logout: () => {
+        setAuthHeaders({});
     },
 
     register: async (email: string, nom: string, prenom: string) => {
@@ -65,15 +80,53 @@ export const parkingApi = {
         return response.data;
     },
 
-    reserveSpot: async (spotId: string) => {
-        // User creates reservation by associating the spot to themselves
-        const response = await api.patch('/users/me', { spot_associe: spotId });
+    reserveSpot: async (spotId: string, startDate: string, endDate: string) => {
+        const response = await api.post('/reservations/', {
+            spot_id: spotId,
+            start_date: startDate + "T00:00:00",
+            end_date: endDate + "T23:59:59"
+        });
         return response.data;
     },
 
-    cancelReservation: async () => {
-        // User cancels by setting spot_associe to null
-        const response = await api.patch('/users/me', { spot_associe: null });
+    getMyReservations: async () => {
+        const response = await api.get('/reservations/me');
+        return response.data;
+    },
+
+    checkinReservation: async (reservationId: number) => {
+        const response = await api.patch(`/reservations/${reservationId}/checkin`);
+        return response.data;
+    },
+
+    cancelReservation: async (reservationId: number) => {
+        const response = await api.delete(`/reservations/${reservationId}`);
+        return response.data;
+    },
+
+    // --- Admin (Secretaries Only) ---
+    getUsers: async () => {
+        const response = await api.get('/users/');
+        return response.data;
+    },
+
+    createUser: async (data: { email: string; nom: string; prenom: string; roles: string[]; spot_associe?: string | null }) => {
+        const response = await api.post('/users/', data);
+        return response.data;
+    },
+
+    updateUser: async (userId: number, data: { email?: string; nom?: string; prenom?: string; spot_associe?: string | null }) => {
+        const response = await api.patch(`/users/${userId}`, data);
+        return response.data;
+    },
+
+    deleteUser: async (userId: number) => {
+        const response = await api.delete(`/users/${userId}`);
+        return response.data;
+    },
+
+    setUserRoles: async (userId: number, roles: string[]) => {
+        const response = await api.put(`/users/${userId}/roles`, { roles });
         return response.data;
     }
 };

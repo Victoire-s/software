@@ -20,18 +20,35 @@ interface ReservationPanelProps {
   onNeedsElectricChange: (needs: boolean) => void;
   onReserve: () => void;
   loading: boolean;
+  currentUserRole: string;
 }
 
-const ReservationPanel: React.FC<ReservationPanelProps> = ({ 
-  selectedSpot, 
-  dateRange, 
-  onDateRangeChange, 
+const countWorkingDays = (start: Date, end: Date): number => {
+  let count = 0;
+  const current = new Date(start);
+  current.setHours(0, 0, 0, 0);
+  const endNorm = new Date(end);
+  endNorm.setHours(0, 0, 0, 0);
+  while (current <= endNorm) {
+    const day = current.getDay();
+    if (day !== 0 && day !== 6) count++;
+    current.setDate(current.getDate() + 1);
+  }
+  return count;
+};
+
+const ReservationPanel: React.FC<ReservationPanelProps> = ({
+  selectedSpot,
+  dateRange,
+  onDateRangeChange,
   needsElectric,
   onNeedsElectricChange,
   onReserve,
-  loading 
+  loading,
+  currentUserRole
 }) => {
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [isSingleDay, setIsSingleDay] = useState<boolean>(true);
 
   const validateDates = (): boolean => {
     const errors: ValidationErrors = {};
@@ -58,18 +75,21 @@ const ReservationPanel: React.FC<ReservationPanelProps> = ({
       errors.endDate = 'La date de fin doit être après la date de début';
     }
 
-    // Vérifier la durée maximale (5 jours pour employés, 30 pour managers)
-    let diffDays = 0;
+    // Vérifier la durée maximale (5 jours ouvrables pour employés, 30 jours calendaires pour managers)
+    const isManager = currentUserRole === 'MANAGER';
+
     if (!errors.startDate && !errors.endDate) {
-      const diffTime = Math.abs(end.getTime() - start.getTime());
-      diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    }
-    
-    // TODO: Adapter selon le rôle de l'utilisateur (manager = 30 jours, employé = 5 jours)
-    const maxDays = 5; // Changer à 30 pour les managers
-    
-    if (diffDays > maxDays) {
-      errors.duration = `La durée maximale est de ${maxDays} jours`;
+      if (isManager) {
+        const calendarDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        if (calendarDays > 30) {
+          errors.duration = `La durée maximale est de 30 jours calendaires`;
+        }
+      } else {
+        const workingDays = countWorkingDays(start, end);
+        if (workingDays > 5) {
+          errors.duration = `La durée maximale est de 5 jours ouvrables (lun.–ven.)`;
+        }
+      }
     }
 
     setErrors(errors);
@@ -81,9 +101,11 @@ const ReservationPanel: React.FC<ReservationPanelProps> = ({
   }, [dateRange]);
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const newStartDate = e.target.value;
     onDateRangeChange({
       ...dateRange,
-      startDate: e.target.value
+      startDate: newStartDate,
+      endDate: isSingleDay ? newStartDate : Math.max(new Date(dateRange.endDate).getTime(), new Date(newStartDate).getTime()) === new Date(newStartDate).getTime() ? newStartDate : dateRange.endDate
     });
   };
 
@@ -108,10 +130,26 @@ const ReservationPanel: React.FC<ReservationPanelProps> = ({
   return (
     <div className="reservation-panel">
       <h3>Nouvelle Réservation</h3>
-      
+
       <form onSubmit={handleSubmit}>
+        <div className="form-group checkbox-group" style={{ marginBottom: "0.5rem", padding: "0.5rem" }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={isSingleDay}
+              onChange={(e) => {
+                setIsSingleDay(e.target.checked);
+                if (e.target.checked) {
+                  onDateRangeChange({ ...dateRange, endDate: dateRange.startDate });
+                }
+              }}
+            />
+            <span>Réserver pour un seul jour</span>
+          </label>
+        </div>
+
         <div className="form-group">
-          <label htmlFor="start-date">Date de début</label>
+          <label htmlFor="start-date">{isSingleDay ? "Date" : "Date de début"}</label>
           <input
             type="date"
             id="start-date"
@@ -123,18 +161,20 @@ const ReservationPanel: React.FC<ReservationPanelProps> = ({
           {errors.startDate && <span className="error">{errors.startDate}</span>}
         </div>
 
-        <div className="form-group">
-          <label htmlFor="end-date">Date de fin</label>
-          <input
-            type="date"
-            id="end-date"
-            value={dateRange.endDate}
-            onChange={handleEndDateChange}
-            min={dateRange.startDate}
-            required
-          />
-          {errors.endDate && <span className="error">{errors.endDate}</span>}
-        </div>
+        {!isSingleDay && (
+          <div className="form-group">
+            <label htmlFor="end-date">Date de fin</label>
+            <input
+              type="date"
+              id="end-date"
+              value={dateRange.endDate}
+              onChange={handleEndDateChange}
+              min={dateRange.startDate}
+              required
+            />
+            {errors.endDate && <span className="error">{errors.endDate}</span>}
+          </div>
+        )}
 
         {errors.duration && (
           <div className="alert alert-warning">
@@ -170,8 +210,8 @@ const ReservationPanel: React.FC<ReservationPanelProps> = ({
           )}
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="btn-primary btn-reserve"
           disabled={!selectedSpot || loading || Object.keys(errors).length > 0}
         >

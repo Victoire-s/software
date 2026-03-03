@@ -1,0 +1,556 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.0.2, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+rootdir: /app
+configfile: pytest.ini
+plugins: anyio-4.12.1, asyncio-1.3.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 51 items
+
+tests/routes/test_parking_routes.py::test_parking_view_requires_manager_or_secretary PASSED [  1%]
+tests/routes/test_parking_routes.py::test_parking_view_ok_for_manager PASSED [  3%]
+tests/routes/test_parking_routes.py::test_parking_config_requires_secretary PASSED [  5%]
+tests/routes/test_parking_routes.py::test_parking_config_ok_for_secretary PASSED [  7%]
+tests/routes/test_parking_routes.py::test_parking_update_config_validates_body PASSED [  9%]
+tests/routes/test_reservation_routes.py::test_employee_can_reserve_5_days_max FAILED [ 11%]
+tests/routes/test_reservation_routes.py::test_manager_can_reserve_30_days_max ERROR [ 13%]
+tests/routes/test_reservation_routes.py::test_overlap_prevention ERROR   [ 15%]
+tests/routes/test_spots_routes.py::test_spots_available_requires_auth PASSED [ 17%]
+tests/routes/test_spots_routes.py::test_spots_available_ok PASSED        [ 19%]
+tests/routes/test_spots_routes.py::test_spots_get_ok PASSED              [ 21%]
+tests/routes/test_spots_routes.py::test_spots_get_404 PASSED             [ 23%]
+tests/routes/test_spots_routes.py::test_spots_create_requires_secretary PASSED [ 25%]
+tests/routes/test_spots_routes.py::test_spots_create_ok_for_secretary PASSED [ 27%]
+tests/routes/test_users_routes.py::test_users_me_requires_auth PASSED    [ 29%]
+tests/routes/test_users_routes.py::test_users_me_ok PASSED               [ 31%]
+tests/routes/test_users_routes.py::test_users_me_not_found PASSED        [ 33%]
+tests/routes/test_users_routes.py::test_users_patch_me_rejects_unknown_field PASSED [ 35%]
+tests/routes/test_users_routes.py::test_users_list_requires_secretary PASSED [ 37%]
+tests/routes/test_users_routes.py::test_users_list_ok_for_secretary PASSED [ 39%]
+tests/routes/test_users_routes.py::test_users_create_ok_for_secretary_normalizes_roles PASSED [ 41%]
+tests/test_hello.py::test_post_hello_stores_and_returns PASSED           [ 43%]
+tests/test_parking_repository.py::TestParkingRepository::test_get_config_autocreate_update_delete PASSED [ 45%]
+tests/test_parking_repository.py::TestParkingRepository::test_create_or_reset_config PASSED [ 47%]
+tests/test_parking_repository.py::TestParkingRepository::test_get_parking_view PASSED [ 49%]
+tests/test_parking_service.py::test_get_config_calls_repo PASSED         [ 50%]
+tests/test_parking_service.py::test_update_config_calls_repo PASSED      [ 52%]
+tests/test_parking_service.py::test_reset_config_calls_repo PASSED       [ 54%]
+tests/test_parking_service.py::test_get_parking_view_calls_repo PASSED   [ 56%]
+tests/test_rabbitmq.py::test_post_hello_publishes_event_to_rabbitmq FAILED [ 58%]
+tests/test_spot_repository.py::TestSpotRepository::test_create_get_list_update_delete PASSED [ 60%]
+tests/test_spot_repository.py::TestSpotRepository::test_list_available_filter_electrical PASSED [ 62%]
+tests/test_spot_service.py::test_create_spot_calls_repo PASSED           [ 64%]
+tests/test_spot_service.py::test_get_spot_calls_repo PASSED              [ 66%]
+tests/test_spot_service.py::test_list_spots_calls_repo PASSED            [ 68%]
+tests/test_spot_service.py::test_update_spot_calls_repo PASSED           [ 70%]
+tests/test_spot_service.py::test_delete_spot_calls_repo PASSED           [ 72%]
+tests/test_spot_service.py::test_list_available_calls_repo PASSED        [ 74%]
+tests/test_user_repository.py::TestUserRepository::test_create_get_by_id_get_by_email_list PASSED [ 76%]
+tests/test_user_repository.py::TestUserRepository::test_update_user PASSED [ 78%]
+tests/test_user_repository.py::TestUserRepository::test_roles_methods PASSED [ 80%]
+tests/test_user_repository.py::TestUserRepository::test_delete PASSED    [ 82%]
+tests/test_user_service.py::test_create_user_calls_repo_and_returns_value PASSED [ 84%]
+tests/test_user_service.py::test_get_user_calls_repo PASSED              [ 86%]
+tests/test_user_service.py::test_list_users_calls_repo PASSED            [ 88%]
+tests/test_user_service.py::test_update_user_calls_repo PASSED           [ 90%]
+tests/test_user_service.py::test_delete_user_calls_repo PASSED           [ 92%]
+tests/test_user_service.py::test_set_roles_rejects_empty_roles PASSED    [ 94%]
+tests/test_user_service.py::test_set_roles_calls_repo PASSED             [ 96%]
+tests/test_user_service.py::test_add_role_calls_repo PASSED              [ 98%]
+tests/test_user_service.py::test_remove_role_calls_repo PASSED           [100%]
+
+==================================== ERRORS ====================================
+____________ ERROR at setup of test_manager_can_reserve_30_days_max ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f19718b3590>
+
+    @pytest.fixture
+    def app(monkeypatch):
+        monkeypatch.setattr(res_ctrl, "UserRepository", DummyUserRepository)
+        monkeypatch.setattr(res_ctrl, "SpotRepository", DummySpotRepository)
+        monkeypatch.setattr(res_ctrl, "ReservationRepository", DummyReservationRepository)
+    
+        # Needs to be patched at the root of the blueprint or in the app factory
+        # The actual make_test_app doesn't register bp_reservations... Let's use a modified factory or modify the test app directly
+        def make_res_app():
+            from routes.users_controller import bp_users
+            import routes.reservations_controller as rc
+            from sanic import Sanic
+            Sanic.test_mode = True
+            try:
+                a = Sanic.get_app("test-res-app")
+            except:
+                a = Sanic("test-res-app")
+    
+            class _Ctx:
+                async def __aenter__(self): return object()
+                async def __aexit__(self, exc_type, exc, tb): return False
+            class _Fac:
+                def __call__(self): return _Ctx()
+    
+            a.ctx.Session = _Fac()
+            a.blueprint(bp_users)
+            a.blueprint(rc.bp_reservations)
+            return a
+    
+>       return make_res_app()
+               ^^^^^^^^^^^^^^
+
+tests/routes/test_reservation_routes.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/routes/test_reservation_routes.py:96: in make_res_app
+    a.blueprint(bp_users)
+/usr/local/lib/python3.13/site-packages/sanic/app.py:940: in blueprint
+    blueprint.register(self, options)
+/usr/local/lib/python3.13/site-packages/sanic/blueprints.py:413: in register
+    route = app._apply_route(
+/usr/local/lib/python3.13/site-packages/sanic/app.py:608: in _apply_route
+    routes = self.router.add(**params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/sanic/router.py:149: in add
+    route = super().add(**params)  # type: ignore
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/sanic_routing/router.py:252: in add
+    group.merge(existing_group, overwrite, append)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <RouteGroup: path=users len=1>, group = <RouteGroup: path=users len=2>
+overwrite = False, append = False
+
+    def merge(
+        self, group: RouteGroup, overwrite: bool = False, append: bool = False
+    ) -> None:
+        """
+        The purpose of merge is to group routes with the same path, but
+        declarared individually. In other words to group these:
+    
+        .. code-block:: python
+    
+            @app.get("/path/to")
+            def handler1(...):
+                ...
+    
+            @app.post("/path/to")
+            def handler2(...):
+                ...
+    
+        The other main purpose is to look for conflicts and
+        raise ``RouteExists``
+    
+        A duplicate route is when:
+        1. They have the same path and any overlapping methods; AND
+        2. If they have requirements, they are the same
+    
+        :param group: Incoming route group
+        :type group: RouteGroup
+        :param overwrite: whether to allow an otherwise duplicate route group
+            to overwrite the existing, if ``True`` will not raise exception
+            on duplicates, defaults to False
+        :type overwrite: bool, optional
+        :param append: whether to allow an otherwise duplicate route group to
+            append its routes to the existing route group, defaults to False
+        :type append: bool, optional
+        :raises RouteExists: Raised when there is a duplicate
+        """
+        _routes = list(self._routes)
+        for other_route in group.routes:
+            for current_route in self:
+                if (
+                    current_route == other_route
+                    or (
+                        current_route.requirements
+                        and not other_route.requirements
+                    )
+                    or (
+                        not current_route.requirements
+                        and other_route.requirements
+                    )
+                ) and not append:
+                    if not overwrite:
+>                       raise RouteExists(
+                            f"Route already registered: {self.raw_path} "
+                            f"[{','.join(self.methods)}]"
+                        )
+E                       sanic_routing.exceptions.RouteExists: Route already registered: users [GET]
+
+/usr/local/lib/python3.13/site-packages/sanic_routing/group.py:168: RouteExists
+__________________ ERROR at setup of test_overlap_prevention ___________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f196f820410>
+
+    @pytest.fixture
+    def app(monkeypatch):
+        monkeypatch.setattr(res_ctrl, "UserRepository", DummyUserRepository)
+        monkeypatch.setattr(res_ctrl, "SpotRepository", DummySpotRepository)
+        monkeypatch.setattr(res_ctrl, "ReservationRepository", DummyReservationRepository)
+    
+        # Needs to be patched at the root of the blueprint or in the app factory
+        # The actual make_test_app doesn't register bp_reservations... Let's use a modified factory or modify the test app directly
+        def make_res_app():
+            from routes.users_controller import bp_users
+            import routes.reservations_controller as rc
+            from sanic import Sanic
+            Sanic.test_mode = True
+            try:
+                a = Sanic.get_app("test-res-app")
+            except:
+                a = Sanic("test-res-app")
+    
+            class _Ctx:
+                async def __aenter__(self): return object()
+                async def __aexit__(self, exc_type, exc, tb): return False
+            class _Fac:
+                def __call__(self): return _Ctx()
+    
+            a.ctx.Session = _Fac()
+            a.blueprint(bp_users)
+            a.blueprint(rc.bp_reservations)
+            return a
+    
+>       return make_res_app()
+               ^^^^^^^^^^^^^^
+
+tests/routes/test_reservation_routes.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/routes/test_reservation_routes.py:96: in make_res_app
+    a.blueprint(bp_users)
+/usr/local/lib/python3.13/site-packages/sanic/app.py:940: in blueprint
+    blueprint.register(self, options)
+/usr/local/lib/python3.13/site-packages/sanic/blueprints.py:413: in register
+    route = app._apply_route(
+/usr/local/lib/python3.13/site-packages/sanic/app.py:608: in _apply_route
+    routes = self.router.add(**params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/sanic/router.py:149: in add
+    route = super().add(**params)  # type: ignore
+            ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/sanic_routing/router.py:252: in add
+    group.merge(existing_group, overwrite, append)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <RouteGroup: path=users len=1>, group = <RouteGroup: path=users len=2>
+overwrite = False, append = False
+
+    def merge(
+        self, group: RouteGroup, overwrite: bool = False, append: bool = False
+    ) -> None:
+        """
+        The purpose of merge is to group routes with the same path, but
+        declarared individually. In other words to group these:
+    
+        .. code-block:: python
+    
+            @app.get("/path/to")
+            def handler1(...):
+                ...
+    
+            @app.post("/path/to")
+            def handler2(...):
+                ...
+    
+        The other main purpose is to look for conflicts and
+        raise ``RouteExists``
+    
+        A duplicate route is when:
+        1. They have the same path and any overlapping methods; AND
+        2. If they have requirements, they are the same
+    
+        :param group: Incoming route group
+        :type group: RouteGroup
+        :param overwrite: whether to allow an otherwise duplicate route group
+            to overwrite the existing, if ``True`` will not raise exception
+            on duplicates, defaults to False
+        :type overwrite: bool, optional
+        :param append: whether to allow an otherwise duplicate route group to
+            append its routes to the existing route group, defaults to False
+        :type append: bool, optional
+        :raises RouteExists: Raised when there is a duplicate
+        """
+        _routes = list(self._routes)
+        for other_route in group.routes:
+            for current_route in self:
+                if (
+                    current_route == other_route
+                    or (
+                        current_route.requirements
+                        and not other_route.requirements
+                    )
+                    or (
+                        not current_route.requirements
+                        and other_route.requirements
+                    )
+                ) and not append:
+                    if not overwrite:
+>                       raise RouteExists(
+                            f"Route already registered: {self.raw_path} "
+                            f"[{','.join(self.methods)}]"
+                        )
+E                       sanic_routing.exceptions.RouteExists: Route already registered: users [GET]
+
+/usr/local/lib/python3.13/site-packages/sanic_routing/group.py:168: RouteExists
+=================================== FAILURES ===================================
+_____________________ test_employee_can_reserve_5_days_max _____________________
+
+app = Sanic(name="test-res-app")
+
+    @pytest.mark.asyncio
+    async def test_employee_can_reserve_5_days_max(app):
+        headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE", "X-User-Email": "emp@test.com"}
+        # Valid 3 days
+        async with app.asgi_client as client:
+            _, res = await client.post("/reservations/", headers=headers, json={
+                "spot_id": "A01",
+                "start_date": "2030-01-01T00:00:00",
+                "end_date": "2030-01-03T00:00:00"
+            })
+            assert res.status == 201
+    
+        # Invalid 6 working days (Mon Jan 7 ÔåÆ Mon Jan 14 = Mon+Tue+Wed+Thu+Fri+Mon = 6)
+>       async with app.asgi_client as client:
+                   ^^^^^^^^^^^^^^^
+
+tests/routes/test_reservation_routes.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sanic_testing.testing.SanicASGITestClient object at 0x7f196f906690>
+
+    async def __aenter__(self: U) -> U:
+        if self._state != ClientState.UNOPENED:
+            msg = {
+                ClientState.OPENED: "Cannot open a client instance more than once.",
+                ClientState.CLOSED: (
+                    "Cannot reopen a client instance, once it has been closed."
+                ),
+            }[self._state]
+>           raise RuntimeError(msg)
+E           RuntimeError: Cannot reopen a client instance, once it has been closed.
+
+/usr/local/lib/python3.13/site-packages/httpx/_client.py:1998: RuntimeError
+_________________ test_post_hello_publishes_event_to_rabbitmq __________________
+
+self = <aiormq.connection.TCPTransportFactory object at 0x7f196f2bb4d0>
+url = URL('amqp://guest:guest@localhost:5672/'), kwargs = {}
+_ = <aiormq.connection.SSLContextProvider object at 0x7f196f2bafd0>
+
+    async def create(
+            self,
+            url: URL,
+            **kwargs: Any
+    ) -> Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
+        # unexpected for asyncio.open_connection ignoring it
+        _ = kwargs.pop("ssl_context_provider", None)
+        try:
+>           return await asyncio.open_connection(
+                host=url.host, port=url.port, ssl=None, **kwargs,
+            )
+
+/usr/local/lib/python3.13/site-packages/aiormq/connection.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/asyncio/streams.py:48: in open_connection
+    transport, _ = await loop.create_connection(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_UnixSelectorEventLoop running=False closed=False debug=False>
+protocol_factory = <function open_connection.<locals>.<lambda> at 0x7f196f400860>
+host = 'localhost', port = 5672
+
+    async def create_connection(
+            self, protocol_factory, host=None, port=None,
+            *, ssl=None, family=0,
+            proto=0, flags=0, sock=None,
+            local_addr=None, server_hostname=None,
+            ssl_handshake_timeout=None,
+            ssl_shutdown_timeout=None,
+            happy_eyeballs_delay=None, interleave=None,
+            all_errors=False):
+        """Connect to a TCP server.
+    
+        Create a streaming transport connection to a given internet host and
+        port: socket family AF_INET or socket.AF_INET6 depending on host (or
+        family if specified), socket type SOCK_STREAM. protocol_factory must be
+        a callable returning a protocol instance.
+    
+        This method is a coroutine which will try to establish the connection
+        in the background.  When successful, the coroutine returns a
+        (transport, protocol) pair.
+        """
+        if server_hostname is not None and not ssl:
+            raise ValueError('server_hostname is only meaningful with ssl')
+    
+        if server_hostname is None and ssl:
+            # Use host as default for server_hostname.  It is an error
+            # if host is empty or not set, e.g. when an
+            # already-connected socket was passed or when only a port
+            # is given.  To avoid this error, you can pass
+            # server_hostname='' -- this will bypass the hostname
+            # check.  (This also means that if host is a numeric
+            # IP/IPv6 address, we will attempt to verify that exact
+            # address; this will probably fail, but it is possible to
+            # create a certificate for a specific IP address, so we
+            # don't judge it here.)
+            if not host:
+                raise ValueError('You must set server_hostname '
+                                 'when using ssl without a host')
+            server_hostname = host
+    
+        if ssl_handshake_timeout is not None and not ssl:
+            raise ValueError(
+                'ssl_handshake_timeout is only meaningful with ssl')
+    
+        if ssl_shutdown_timeout is not None and not ssl:
+            raise ValueError(
+                'ssl_shutdown_timeout is only meaningful with ssl')
+    
+        if sock is not None:
+            _check_ssl_socket(sock)
+    
+        if happy_eyeballs_delay is not None and interleave is None:
+            # If using happy eyeballs, default to interleave addresses by family
+            interleave = 1
+    
+        if host is not None or port is not None:
+            if sock is not None:
+                raise ValueError(
+                    'host/port and sock can not be specified at the same time')
+    
+            infos = await self._ensure_resolved(
+                (host, port), family=family,
+                type=socket.SOCK_STREAM, proto=proto, flags=flags, loop=self)
+            if not infos:
+                raise OSError('getaddrinfo() returned empty list')
+    
+            if local_addr is not None:
+                laddr_infos = await self._ensure_resolved(
+                    local_addr, family=family,
+                    type=socket.SOCK_STREAM, proto=proto,
+                    flags=flags, loop=self)
+                if not laddr_infos:
+                    raise OSError('getaddrinfo() returned empty list')
+            else:
+                laddr_infos = None
+    
+            if interleave:
+                infos = _interleave_addrinfos(infos, interleave)
+    
+            exceptions = []
+            if happy_eyeballs_delay is None:
+                # not using happy eyeballs
+                for addrinfo in infos:
+                    try:
+                        sock = await self._connect_sock(
+                            exceptions, addrinfo, laddr_infos)
+                        break
+                    except OSError:
+                        continue
+            else:  # using happy eyeballs
+                sock = (await staggered.staggered_race(
+                    (
+                        # can't use functools.partial as it keeps a reference
+                        # to exceptions
+                        lambda addrinfo=addrinfo: self._connect_sock(
+                            exceptions, addrinfo, laddr_infos
+                        )
+                        for addrinfo in infos
+                    ),
+                    happy_eyeballs_delay,
+                    loop=self,
+                ))[0]  # can't use sock, _, _ as it keeks a reference to exceptions
+    
+            if sock is None:
+                exceptions = [exc for sub in exceptions for exc in sub]
+                try:
+                    if all_errors:
+                        raise ExceptionGroup("create_connection failed", exceptions)
+                    if len(exceptions) == 1:
+                        raise exceptions[0]
+                    elif exceptions:
+                        # If they all have the same str(), raise one.
+                        model = str(exceptions[0])
+                        if all(str(exc) == model for exc in exceptions):
+                            raise exceptions[0]
+                        # Raise a combined exception so the user can see all
+                        # the various error messages.
+>                       raise OSError('Multiple exceptions: {}'.format(
+                            ', '.join(str(exc) for exc in exceptions)))
+E                           OSError: Multiple exceptions: [Errno 111] Connect call failed ('127.0.0.1', 5672), [Errno 99] Cannot assign requested address
+
+/usr/local/lib/python3.13/asyncio/base_events.py:1179: OSError
+
+The above exception was the direct cause of the following exception:
+
+    @pytest.mark.asyncio
+    async def test_post_hello_publishes_event_to_rabbitmq():
+        os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
+        os.environ["AMQP_URL"] = "amqp://guest:guest@localhost:5672/"
+        os.environ["HELLO_QUEUE"] = "hello.queue"
+        os.environ["SANIC_TEST_MODE"] = "1"
+    
+        # Connexion RabbitMQ pour purger + lire le message
+>       connection = await aio_pika.connect_robust(os.environ["AMQP_URL"])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_rabbitmq.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.13/site-packages/aio_pika/robust_connection.py:334: in connect_robust
+    await connection.connect(timeout=timeout)
+/usr/local/lib/python3.13/site-packages/aio_pika/robust_connection.py:180: in connect
+    await self.__fail_fast_future
+/usr/local/lib/python3.13/site-packages/aio_pika/robust_connection.py:135: in __connection_factory
+    await Connection.connect(self, self.__connect_timeout)
+/usr/local/lib/python3.13/site-packages/aio_pika/connection.py:125: in connect
+    self.transport = await UnderlayConnection.connect(
+/usr/local/lib/python3.13/site-packages/aio_pika/abc.py:679: in connect
+    connection = await cls.make_connection(
+/usr/local/lib/python3.13/site-packages/aio_pika/abc.py:667: in make_connection
+    connection: aiormq.abc.AbstractConnection = await asyncio.wait_for(
+/usr/local/lib/python3.13/asyncio/tasks.py:507: in wait_for
+    return await fut
+           ^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/aiormq/connection.py:1014: in connect
+    await connection.connect(client_properties or {})
+/usr/local/lib/python3.13/site-packages/aiormq/base.py:164: in wrap
+    return await self.create_task(func(self, *args, **kwargs))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/aiormq/abc.py:44: in __inner
+    return await self.task
+           ^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/aiormq/connection.py:551: in connect
+    raise e
+/usr/local/lib/python3.13/site-packages/aiormq/connection.py:540: in connect
+    reader, writer = await self._transport_factory.create(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aiormq.connection.TCPTransportFactory object at 0x7f196f2bb4d0>
+url = URL('amqp://guest:guest@localhost:5672/'), kwargs = {}
+_ = <aiormq.connection.SSLContextProvider object at 0x7f196f2bafd0>
+
+    async def create(
+            self,
+            url: URL,
+            **kwargs: Any
+    ) -> Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
+        # unexpected for asyncio.open_connection ignoring it
+        _ = kwargs.pop("ssl_context_provider", None)
+        try:
+            return await asyncio.open_connection(
+                host=url.host, port=url.port, ssl=None, **kwargs,
+            )
+        except OSError as e:
+>           raise AMQPConnectionError(*e.args) from e
+E           aiormq.exceptions.AMQPConnectionError: Multiple exceptions: [Errno 111] Connect call failed ('127.0.0.1', 5672), [Errno 99] Cannot assign requested address
+
+/usr/local/lib/python3.13/site-packages/aiormq/connection.py:330: AMQPConnectionError
+------------------------------ Captured log call -------------------------------
+ERROR    aiormq.connection:connection.py:550 error when creating transport: <AMQPConnectionError: ("Multiple exceptions: [Errno 111] Connect call failed ('127.0.0.1', 5672), [Errno 99] Cannot assign requested address",)>
+=============================== warnings summary ===============================
+tests/routes/test_parking_routes.py::test_parking_view_requires_manager_or_secretary
+  /usr/local/lib/python3.13/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/routes/test_reservation_routes.py::test_employee_can_reserve_5_days_max
+FAILED tests/test_rabbitmq.py::test_post_hello_publishes_event_to_rabbitmq - ...
+ERROR tests/routes/test_reservation_routes.py::test_manager_can_reserve_30_days_max
+ERROR tests/routes/test_reservation_routes.py::test_overlap_prevention - sani...
+============== 2 failed, 47 passed, 1 warning, 2 errors in 8.32s ===============

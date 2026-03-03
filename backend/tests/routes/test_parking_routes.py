@@ -44,7 +44,7 @@ def app(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_parking_view_requires_manager_or_secretary(app):
-    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE"}
+    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE", "X-User-Email": "test@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/parking/view", headers=headers)
         assert res.status == 403
@@ -52,7 +52,7 @@ async def test_parking_view_requires_manager_or_secretary(app):
 
 @pytest.mark.asyncio
 async def test_parking_view_ok_for_manager(app):
-    headers = {"X-User-Id": "2", "X-User-Roles": "MANAGER"}
+    headers = {"X-User-Id": "2", "X-User-Roles": "MANAGER", "X-User-Email": "manager@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/parking/view", headers=headers)
         assert res.status == 200
@@ -61,7 +61,7 @@ async def test_parking_view_ok_for_manager(app):
 
 @pytest.mark.asyncio
 async def test_parking_config_requires_secretary(app):
-    headers = {"X-User-Id": "2", "X-User-Roles": "MANAGER"}
+    headers = {"X-User-Id": "2", "X-User-Roles": "MANAGER", "X-User-Email": "manager@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/parking/config", headers=headers)
         assert res.status == 403
@@ -69,7 +69,7 @@ async def test_parking_config_requires_secretary(app):
 
 @pytest.mark.asyncio
 async def test_parking_config_ok_for_secretary(app):
-    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE"}
+    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE", "X-User-Email": "secretaire@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/parking/config", headers=headers)
         assert res.status == 200
@@ -78,7 +78,7 @@ async def test_parking_config_ok_for_secretary(app):
 
 @pytest.mark.asyncio
 async def test_parking_update_config_validates_body(app):
-    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE"}
+    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE", "X-User-Email": "secretaire@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.put("/parking/config", headers=headers, json={"slots_max": -1})
         assert res.status == 400

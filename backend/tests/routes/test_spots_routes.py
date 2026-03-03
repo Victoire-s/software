@@ -62,7 +62,7 @@ async def test_spots_available_requires_auth(app):
 
 @pytest.mark.asyncio
 async def test_spots_available_ok(app):
-    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE"}
+    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE", "X-User-Email": "test@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/spots/available?electrical_required=1", headers=headers)
         assert res.status == 200
@@ -72,7 +72,7 @@ async def test_spots_available_ok(app):
 
 @pytest.mark.asyncio
 async def test_spots_get_ok(app):
-    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE"}
+    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE", "X-User-Email": "test@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/spots/A01", headers=headers)
         assert res.status == 200
@@ -81,7 +81,7 @@ async def test_spots_get_ok(app):
 
 @pytest.mark.asyncio
 async def test_spots_get_404(app):
-    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE"}
+    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE", "X-User-Email": "test@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.get("/spots/ZZ99", headers=headers)
         assert res.status == 404
@@ -89,7 +89,7 @@ async def test_spots_get_404(app):
 
 @pytest.mark.asyncio
 async def test_spots_create_requires_secretary(app):
-    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE"}
+    headers = {"X-User-Id": "1", "X-User-Roles": "EMPLOYEE", "X-User-Email": "test@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.post("/spots", headers=headers, json={"id": "A01", "electrical": True})
         assert res.status == 403
@@ -97,7 +97,7 @@ async def test_spots_create_requires_secretary(app):
 
 @pytest.mark.asyncio
 async def test_spots_create_ok_for_secretary(app):
-    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE"}
+    headers = {"X-User-Id": "99", "X-User-Roles": "SECRETAIRE", "X-User-Email": "secretaire@company.com"}
     async with app.asgi_client as client:
         _req, res = await client.post("/spots", headers=headers, json={"id": "a01", "electrical": True, "is_free": True})
         assert res.status in (200, 201)

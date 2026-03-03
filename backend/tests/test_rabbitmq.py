@@ -9,7 +9,7 @@ from app import create_app
 @pytest.mark.asyncio
 async def test_post_hello_publishes_event_to_rabbitmq():
     os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
-    os.environ["AMQP_URL"] = "amqp://guest:guest@localhost:5672/"
+    os.environ["AMQP_URL"] = os.environ.get("AMQP_URL", "amqp://guest:guest@localhost:5672/")
     os.environ["HELLO_QUEUE"] = "hello.queue"
     os.environ["SANIC_TEST_MODE"] = "1"
 

@@ -57,6 +57,20 @@ parking_config_table = Table(
     Column("updated_at", DateTime, server_default=func.now(), onupdate=func.now(), nullable=False),
 )
 
+# --- RESERVATIONS ---
+reservations_table = Table(
+    "reservations",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("spot_id", String(3), ForeignKey("spots.id", ondelete="CASCADE"), nullable=False),
+    Column("user_id", Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+    Column("start_date", DateTime, nullable=False),
+    Column("end_date", DateTime, nullable=False),
+    Column("checked_in", Boolean, nullable=False, default=False),
+    Column("created_at", DateTime, server_default=func.now(), nullable=False),
+    Column("updated_at", DateTime, server_default=func.now(), onupdate=func.now(), nullable=False),
+)
+
 
 def get_database_url() -> str:
     # Exemple MySQL: mysql+asyncmy://user:pass@localhost:3306/parking

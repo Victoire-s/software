@@ -1,14 +1,15 @@
 .parking-spot {
   aspect-ratio: 1;
-  border-radius: 6px;
+  border-radius: var(--border-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
   position: relative;
   min-height: 60px;
+  overflow: hidden;
 }
 
 .spot-content {
@@ -19,70 +20,91 @@
   gap: 0.25rem;
   width: 100%;
   height: 100%;
+  position: relative;
+  z-index: 2;
 }
 
 .spot-id {
-  font-weight: 600;
-  font-size: 0.75rem;
+  font-weight: 700;
+  font-size: 0.85rem;
   color: var(--text-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .electric-icon {
-  font-size: 0.875rem;
   position: absolute;
-  top: 2px;
-  right: 2px;
+  top: 4px;
+  right: 4px;
   background: var(--electric-color);
-  color: white;
-  width: 18px;
-  height: 18px;
+  color: #78350f;
+  /* Amber 900 for high contrast */
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: 0.625rem;
+  font-size: 0.65rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 3;
 }
 
 /* Available spot */
 .parking-spot.available {
-  background: white;
-  border-color: var(--primary-light);
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+  background: rgba(16, 185, 129, 0.15);
+  /* Emerald tint */
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1);
 }
 
 .parking-spot.available:hover {
-  background: #eff6ff;
-  border-color: var(--primary-color);
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.6);
+  transform: scale(1.08) translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.1);
   z-index: 10;
 }
 
 /* Reserved spot */
 .parking-spot.reserved {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  border-color: var(--danger-color);
+  background: var(--reserved-bg);
+  border-color: rgba(255, 255, 255, 0.05);
   cursor: not-allowed;
-  opacity: 0.8;
+}
+
+.parking-spot.reserved::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(45deg,
+      transparent,
+      transparent 10px,
+      rgba(239, 68, 68, 0.05) 10px,
+      rgba(239, 68, 68, 0.05) 20px);
+  z-index: 1;
 }
 
 .parking-spot.reserved .spot-id {
-  color: var(--danger-color);
+  color: var(--text-muted);
+  opacity: 0.5;
 }
 
 /* Selected spot */
 .parking-spot.selected {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  border-color: var(--primary-dark);
-  transform: scale(1.08);
-  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
+  border-color: var(--primary-light);
+  transform: scale(1.1) translateY(-4px);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 10px 15px -3px rgba(99, 102, 241, 0.4);
   z-index: 20;
-  animation: pulse 2s infinite;
+  animation: pulse-glow 2s infinite ease-in-out;
 }
 
 .parking-spot.selected .spot-id {
   color: white;
-  font-weight: 700;
+  font-size: 1rem;
 }
 
 .parking-spot.selected .electric-icon {
@@ -92,33 +114,39 @@
 
 /* Unavailable spot (filtered out by needs) */
 .parking-spot.unavailable {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: rgba(15, 23, 42, 0.8);
+  border-color: transparent;
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.4;
+  filter: grayscale(1);
 }
 
 .parking-spot.unavailable .spot-id {
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 /* Electric spots special styling */
 .parking-spot.has-electric.available {
-  background: linear-gradient(135deg, #fffbeb 0%, white 100%);
-  border-color: var(--electric-color);
+  background: rgba(251, 191, 36, 0.15);
+  border-color: rgba(251, 191, 36, 0.4);
 }
 
 .parking-spot.has-electric.available:hover {
-  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+  background: rgba(251, 191, 36, 0.25);
+  border-color: rgba(251, 191, 36, 0.6);
+  box-shadow: 0 10px 15px -3px rgba(251, 191, 36, 0.3), 0 4px 6px -2px rgba(251, 191, 36, 0.1);
 }
 
 /* Pulse animation for selected spot */
-@keyframes pulse {
-  0%, 100% {
-    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 10px 15px -3px rgba(99, 102, 241, 0.4);
   }
+
   50% {
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.6);
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.8), 0 10px 20px -3px rgba(99, 102, 241, 0.6);
   }
 }
 
@@ -129,31 +157,31 @@
   }
 
   .spot-id {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
 
   .electric-icon {
     width: 16px;
     height: 16px;
     font-size: 0.5rem;
+    top: 2px;
+    right: 2px;
   }
 }
 
 @media (max-width: 768px) {
   .parking-spot {
-    min-height: 40px;
+    min-height: 44px;
     border-radius: 4px;
   }
 
   .spot-id {
-    font-size: 0.625rem;
+    font-size: 0.7rem;
   }
 
   .electric-icon {
     width: 14px;
     height: 14px;
-    font-size: 0.5rem;
-    top: 1px;
-    right: 1px;
+    font-size: 0.45rem;
   }
 }
