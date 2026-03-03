@@ -30,12 +30,11 @@ def create_app() -> Sanic:
 
     app = Sanic("parking-reservation-api")
 
-    # ✅ REGISTER ROUTES / BLUEPRINTS HERE
-    app.blueprint(bp_auth)   # ✅ AJOUT
+    app.blueprint(bp_auth)    
     app.blueprint(bp_users)
     app.blueprint(bp_spots)
     app.blueprint(bp_parking)
-    app.blueprint(bp_reservations) # ✅ AJOUT
+    app.blueprint(bp_reservations) 
 
     # --- DB ---
     engine = make_engine()
